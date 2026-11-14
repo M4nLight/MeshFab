@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="cyan">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeshFab — publish &amp; explore 3D models</title>
+    <script>
+        // Тема применяется до загрузки стилей, чтобы страница не мигала
+        document.documentElement.dataset.theme = localStorage.getItem('mf_theme') || 'dark';
+        document.documentElement.dataset.accent = localStorage.getItem('mf_accent') || 'cyan';
+    </script>
+    <!-- Стили сайта -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Иконка сайта: «M» из граней (logo.svg в корне папки) -->
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <!-- model-viewer используется только для превью-карточек в ленте -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <!-- three.js для полноэкранного просмотрщика (кости, сетка, нормали, текстуры).
+         UMD-сборки классическими скриптами, чтобы сайт работал с file:// без сервера -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <!-- Переводы (en / ru / es / zh) -->
+    <script src="i18n.js"></script>
+</head>
+<body>
+
+    <!-- ================= Шапка (как у Sketchfab) ================= -->
+    <header class="topbar">
+        <!-- Логотип: «M» из граней (векторная иконка сайта).
+             Инлайн, чтобы цвет следовал за акцентом из Sttng (var(--accent)) -->
+        <a class="logo" id="logo-home" href="#">
+            <svg class="logo-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="10,54 10,14 24,34 32,20 40,34 54,14 54,54 44,54 44,32 38,42 32,36 26,42 20,32 20,54" fill="var(--accent)" opacity="0.35"/>
+                <polygon points="10,14 24,34 10,40" fill="var(--accent)" opacity="0.9"/>
+                <polygon points="24,34 32,20 32,36 26,42" fill="var(--accent)" opacity="0.65"/>
+                <polygon points="32,20 40,34 32,36" fill="var(--accent)" opacity="0.9"/>
+                <polygon points="40,34 54,14 54,40" fill="var(--accent)" opacity="0.65"/>
+            </svg>
+            <span class="logo-text">MeshFab</span>
+        </a>
+
+        <!-- Поиск + фильтр по категориям -->
+        <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7"/>
+                <path d="M21 21l-4.3-4.3"/>
+            </svg>
+            <input type="text" id="search-input" data-i18n-ph="search.ph" placeholder="Search models…" autocomplete="off">
+        </div>
+        <select class="cat-select" id="cat-filter">
+            <option value="" data-i18n="cat.all">All categories</option>
+            <option value="Characters" data-i18n="cat.Characters">Characters</option>
+            <option value="Creatures" data-i18n="cat.Creatures">Creatures</option>
+            <option value="Vehicles" data-i18n="cat.Vehicles">Vehicles</option>
+            <option value="Architecture" data-i18n="cat.Architecture">Architecture</option>
+            <option value="Nature" data-i18n="cat.Nature">Nature</option>
+            <option value="Abstract" data-i18n="cat.Abstract">Abstract</option>
+            <option value="Other" data-i18n="cat.Other">Other</option>
+        </select>
+
+        <!-- Правая часть шапки: «Upload» + вход/аккаунт + настройки -->
+        <div class="top-actions">
+            <button class="btn primary" id="upload-open" data-i18n="nav.upload" type="button">Upload</button>
+            <div id="auth-area"></div>
+            <!-- Кнопка настроек (страница Sttng) -->
+            <a class="btn icon-btn" id="settings-link" href="Sttng.html" data-i18n-title="nav.settings" title="Settings">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/>
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <main class="page">
+
+        <!-- ================= HOME: лента моделей ================= -->
+        <section class="view active" id="view-home">
+            <h2 class="section-title" data-i18n="home.title">Popular models</h2>
+            <div class="models-grid" id="models-grid"></div>
+            <p class="empty-note hidden" id="grid-empty" data-i18n="home.empty">Nothing found</p>
+        </section>
+
+        <!-- ================= MODEL PAGE ================= -->
+        <section class="view" id="view-model">
+            <div class="model-page">
+                <div class="stage-wrap" id="stage-wrap">
+                    <!-- Сюда three.js вставляет свой canvas -->
+                    <div class="viewer-canvas" id="viewer-canvas"></div>
+
+                    <!-- 2D-просмотр текстуры (без света и материалов, только сама текстура) -->
+                    <div class="tex-viewer hidden" id="tex-viewer">
+                        <div class="tex-toolbar">
+                            <button class="glass-btn small active" id="tex-smooth" data-i18n="tex.smooth" type="button">Smooth</button>
+                            <button class="glass-btn small" id="tex-pixel" data-i18n="tex.pixel" type="button">Pixelated</button>
+                            <button class="glass-btn small" id="tex-close" data-i18n="tex.close" type="button">Close</button>
+                        </div>
+                        <canvas id="tex-canvas"></canvas>
+                    </div>
+
+                    <!-- Панель настроек просмотра (открывается кнопкой справа снизу) -->
+                    <div class="viewer-panel" id="viewer-panel">
+                        <h4 data-i18n="panel.title">Viewer settings</h4>
+
+                        <div class="vsec">
+                            <span class="vsec-title" data-i18n="panel.render">Render</span>
+                            <label class="check-row"><input type="checkbox" id="opt-nopost"><span data-i18n="panel.nopost">No post-processing</span></label>
+                            <label class="check-row"><input type="checkbox" id="opt-autorotate"><span data-i18n="panel.autorotate">Auto-rotate</span></label>
+                        </div>
+
+                        <div class="vsec">
+                            <span class="vsec-title" data-i18n="panel.geometry">Geometry</span>
+                            <label class="check-row"><input type="checkbox" id="opt-wireframe"><span data-i18n="panel.wireframe">Wireframe (polygon grid)</span></label>
+                            <label class="check-row"><input type="checkbox" id="opt-normals"><span data-i18n="panel.normals">Vertex normals (colors)</span></label>
+                        </div>
+
+                        <div class="vsec">
+                            <span class="vsec-title" data-i18n="panel.bones">Bones</span>
+                            <label class="check-row"><input type="checkbox" id="opt-bones"><span data-i18n="panel.show_bones">Show bones</span></label>
+                            <div class="bone-list" id="bones-list"></div>
+                            <p class="vsec-note" id="bones-note" data-i18n="panel.bones_note">Select a bone to see which vertices it influences (Bones → Bones Influence).</p>
+                        </div>
+
+                        <div class="vsec">
+                            <span class="vsec-title" data-i18n="panel.textures">Textures</span>
+                            <div class="tex-list" id="tex-list"></div>
+                            <p class="vsec-note" data-i18n="panel.tex_note">Click a texture slot to view it raw — no lights, no materials. Toggle Smooth / Pixelated filtering.</p>
+                        </div>
+                    </div>
+
+                    <!-- Кнопка открытия панели: справа снизу -->
+                    <button class="panel-fab" id="btn-panel" type="button" data-i18n-title="panel.title" title="Viewer settings">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55h.01a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <aside class="model-side">
+                    <h1 id="md-name">—</h1>
+                    <a href="#" class="md-author" id="md-author">by —</a>
+
+                    <div class="md-meta">
+                        <span id="md-views">0 views</span>
+                        <span id="md-likes">0 likes</span>
+                        <span id="md-date"></span>
+                    </div>
+
+                    <!-- Категория / лицензия / приватность -->
+                    <div class="md-chips" id="md-chips"></div>
+
+                    <p class="md-desc" id="md-desc"></p>
+                    <div class="md-tags" id="md-tags"></div>
+
+                    <div class="md-actions">
+                        <button class="btn" id="md-like" type="button" data-i18n="model.like">Like</button>
+                        <!-- Скачивание: видно только если автор разрешил -->
+                        <a class="btn primary" id="md-download" data-i18n="model.download" download>Download</a>
+                        <span class="no-download hidden" id="md-no-download" data-i18n="model.no_download">Download disabled by author</span>
+                        <!-- Удалить может только автор или админ -->
+                        <button class="btn danger hidden" id="md-delete" data-i18n="model.delete" type="button">Delete</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ================= PROFILE PAGE ================= -->
+        <section class="view" id="view-profile">
+            <div class="profile-head">
+                <div class="profile-avatar" id="pf-avatar">M</div>
+                <div>
+                    <h1 id="pf-name">—</h1>
+                    <p class="profile-sub" id="pf-joined"></p>
+                    <p class="profile-sub" id="pf-bio"></p>
+                </div>
+                <button class="btn ghost hidden" id="pf-logout" data-i18n="profile.logout" type="button">Log out</button>
+            </div>
+            <div class="models-grid" id="profile-grid"></div>
+            <p class="empty-note hidden" id="profile-empty" data-i18n="profile.empty">No models yet</p>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL: sign in / sign up (no email) ================= -->
+    <div class="modal-backdrop hidden" id="auth-modal">
+        <div class="modal glass">
+            <button class="modal-close" id="auth-close" type="button">&times;</button>
+            <h3 id="auth-title">Sign in to MeshFab</h3>
+
+            <div class="auth-switch">
+                <button class="glass-btn active" data-auth="login" data-i18n="auth.tab_login" type="button">Sign in</button>
+                <button class="glass-btn" data-auth="register" data-i18n="auth.tab_register" type="button">Sign up</button>
+            </div>
+
+            <form id="auth-login-form">
+                <input type="text" id="login-user" data-i18n-ph="auth.user_ph" placeholder="Username" maxlength="24" autocomplete="username" required>
+                <input type="password" id="login-pass" data-i18n-ph="auth.pass_ph" placeholder="Password" autocomplete="current-password" required>
+                <button class="btn primary wide" data-i18n="auth.tab_login" type="submit">Sign in</button>
+            </form>
+
+            <!-- Регистрация без мейла: только ник и пароль.
+                 Пароль хранится как PBKDF2-хеш с солью, в открытом виде никогда не сохраняется -->
+            <form id="auth-reg-form" class="hidden">
+                <input type="text" id="reg-user" data-i18n-ph="auth.user_new_ph" placeholder="Pick a username (3–24)" maxlength="24" autocomplete="username" required>
+                <input type="password" id="reg-pass" data-i18n-ph="auth.pass_new_ph" placeholder="Pick a password (min 8)" minlength="8" autocomplete="new-password" required>
+                <input type="password" id="reg-pass2" data-i18n-ph="auth.pass2_ph" placeholder="Repeat password" minlength="8" autocomplete="new-password" required>
+                <button class="btn primary wide" data-i18n="auth.tab_register" type="submit">Create account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: upload a model (как в Sketchfab) ================= -->
+    <div class="modal-backdrop hidden" id="upload-modal">
+        <div class="modal glass wide-modal">
+            <button class="modal-close" id="upload-close" type="button">&times;</button>
+            <h3 data-i18n="upload.title">Upload a model</h3>
+
+            <!-- Выбор файла: перетаскивание или клик.
+                 Файл хранится локально в браузере (IndexedDB), на сервер не отправляется -->
+            <div class="drop-zone" id="up-drop">
+                <p class="drop-title" data-i18n="upload.drop_title">Drag &amp; drop a .glb or .gltf file here</p>
+                <button class="glass-btn small" id="up-file-btn" data-i18n="upload.choose" type="button">Or choose a file</button>
+                <input type="file" id="up-file-input" accept=".glb,.gltf" hidden>
+                <p class="drop-file hidden" id="up-file-name"></p>
+            </div>
+
+            <form id="upload-form">
+                <input type="text" id="up-name" data-i18n-ph="upload.name_ph" placeholder="Model name" maxlength="60" required>
+                <textarea id="up-desc" data-i18n-ph="upload.desc_ph" placeholder="Description (what is it, how it was made…)" maxlength="1000" rows="3"></textarea>
+
+                <div class="form-row">
+                    <select id="up-category">
+                        <option value="" data-i18n="upload.category">Category…</option>
+                        <option value="Characters" data-i18n="cat.Characters">Characters</option>
+                        <option value="Creatures" data-i18n="cat.Creatures">Creatures</option>
+                        <option value="Vehicles" data-i18n="cat.Vehicles">Vehicles</option>
+                        <option value="Architecture" data-i18n="cat.Architecture">Architecture</option>
+                        <option value="Nature" data-i18n="cat.Nature">Nature</option>
+                        <option value="Abstract" data-i18n="cat.Abstract">Abstract</option>
+                        <option value="Other" data-i18n="cat.Other">Other</option>
+                    </select>
+                    <select id="up-license">
+                        <option value="CC0" data-i18n="license.CC0">License: CC0 (public domain)</option>
+                        <option value="CC-BY" selected data-i18n="license.CC-BY">License: CC-BY</option>
+                        <option value="CC-BY-SA" data-i18n="license.CC-BY-SA">License: CC-BY-SA</option>
+                        <option value="Editorial" data-i18n="license.Editorial">Editorial use only</option>
+                    </select>
+                </div>
+
+                <input type="text" id="up-tags" data-i18n-ph="upload.tags_ph" placeholder="Tags, comma separated (low poly, sci-fi…)">
+
+                <div class="form-row">
+                    <label class="check-row">
+                        <input type="checkbox" id="up-public" checked>
+                        <span data-i18n="upload.public">Public</span>
+                    </label>
+                    <label class="check-row">
+                        <input type="checkbox" id="up-downloadable" checked>
+                        <span data-i18n="upload.allow_dl">Allow download</span>
+                    </label>
+                </div>
+
+                <!-- Пост-обработка: применяется к модели по умолчанию при просмотре -->
+                <label class="check-row select-label">
+                    <span data-i18n="upload.post">Default post-processing:</span>
+                    <select id="up-post">
+                        <option value="default" data-i18n="upload.post_on">On (tone mapping)</option>
+                        <option value="none" data-i18n="upload.post_off">No post-processing</option>
+                    </select>
+                </label>
+
+                <!-- Подтверждение правил сообщества (без 18+) -->
+                <label class="check-row rules-check">
+                    <input type="checkbox" id="up-rules" required>
+                    <span data-i18n="upload.rules">I confirm this model follows the Community Rules</span>
+                </label>
+
+                <button class="btn primary wide" data-i18n="upload.publish" type="submit">Publish</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Всплывающие уведомления -->
+    <div id="toast"></div>
+
+    <!-- Скрипты сайта -->
+    <script src="viewer.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

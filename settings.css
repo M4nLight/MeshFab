@@ -1,0 +1,412 @@
+/* Стили страницы настроек Sttng (базовые кнопки/темы берутся из style.css) */
+
+body { padding-top: 76px; }
+
+.settings-crumb {
+    color: var(--muted);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.settings-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.2rem 3rem;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Левая колонка вкладок */
+.settings-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    position: sticky;
+    top: 86px;
+}
+
+.snav-item {
+    appearance: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    padding: 11px 16px;
+    border-radius: 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    transition: color 0.25s, background 0.25s, border-color 0.25s;
+}
+
+.snav-item:hover {
+    color: var(--text);
+    background: var(--glass-bg);
+}
+
+.snav-item.active {
+    color: var(--text);
+    background: var(--glass-bg-2);
+    border-color: var(--glass-border);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 6px 18px var(--shadow);
+}
+
+/* Правая колонка */
+.settings-content { min-width: 0; }
+
+.ssec {
+    display: none;
+    animation: fadeInUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ssec.active { display: block; }
+
+.ssec h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 1.3rem;
+}
+
+.ssec h5 {
+    font-size: 0.72rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 1.4rem 0 0.7rem;
+}
+
+.glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 12px 30px var(--shadow);
+}
+
+/* Карточки выбора темы */
+.theme-cards {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.theme-card {
+    appearance: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.9rem;
+    border-radius: 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+
+.theme-card:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-3px);
+}
+
+.theme-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px var(--accent-soft);
+}
+
+.theme-preview {
+    width: 120px;
+    height: 76px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border-hover);
+    display: block;
+}
+
+/* Мини-превью тем: тёмная и светлая */
+.dark-p {
+    background: linear-gradient(135deg, #0c0c14 0%, #050505 100%);
+    position: relative;
+}
+.dark-p::after {
+    content: '';
+    position: absolute;
+    left: 14px; top: 14px;
+    width: 26px; height: 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.light-p {
+    background: linear-gradient(135deg, #ffffff 0%, #eef1f5 100%);
+    position: relative;
+}
+.light-p::after {
+    content: '';
+    position: absolute;
+    left: 14px; top: 14px;
+    width: 26px; height: 16px;
+    border-radius: 8px;
+    background: rgba(10,30,50,0.06);
+    border: 1px solid rgba(10,30,50,0.18);
+}
+
+.current-mark {
+    font-style: normal;
+    color: var(--accent);
+}
+
+/* Акцентные цвета */
+.accent-row {
+    display: flex;
+    gap: 0.8rem;
+}
+
+.accent-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    appearance: none;
+    background: var(--c);
+    border: 3px solid transparent;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.accent-dot:hover { transform: scale(1.12); }
+
+.accent-dot.active {
+    border-color: var(--text);
+    box-shadow: 0 6px 16px var(--c);
+}
+
+/* Аккаунт */
+.acc-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.3rem;
+}
+
+.acc-name { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; }
+.acc-sub { font-size: 0.78rem; color: var(--muted); letter-spacing: 1px; margin-top: 3px; }
+
+.stack-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: 360px;
+}
+
+.stack-form input {
+    padding: 10px 14px;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+    background: var(--input-bg);
+    border: 1px solid var(--glass-border-hover);
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.stack-form input:focus { border-color: var(--accent); }
+.stack-form input::placeholder { color: var(--faint); }
+
+.danger-row {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 1.4rem;
+    flex-wrap: wrap;
+}
+
+.hint {
+    font-size: 0.78rem;
+    color: var(--faint);
+    letter-spacing: 0.3px;
+    line-height: 1.5;
+}
+
+/* Что видит незалогиненный вместо форм */
+.guest-note {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.9rem;
+    padding: 1.4rem 1.5rem;
+    border-radius: 16px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    font-size: 0.92rem;
+    letter-spacing: 0.3px;
+    color: var(--text);
+    max-width: 440px;
+}
+
+/* Языки */
+.lang-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.9rem;
+    margin-top: 1rem;
+}
+
+.lang-card {
+    appearance: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 1rem 1.1rem;
+    border-radius: 14px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+
+.lang-card:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+}
+
+.lang-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px var(--accent-soft);
+}
+
+.lang-flag { font-size: 1.4rem; }
+
+.lang-sub {
+    font-style: normal;
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+/* Правила сообщества */
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 1rem;
+}
+
+.rule-item {
+    display: flex;
+    gap: 0.9rem;
+    padding: 1rem 1.2rem;
+    align-items: flex-start;
+}
+
+.rule-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent-text);
+    background: var(--accent);
+}
+
+.rule-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 3px;
+}
+
+.rule-desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--muted);
+}
+
+/* Аватар: загрузка/удаление картинки */
+.avatar-controls {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.avatar-controls .btn { cursor: pointer; }
+
+#sec-profile .stack-form,
+#sec-profile textarea {
+    width: 100%;
+    max-width: 440px;
+}
+
+#sec-profile input[type="text"],
+#sec-profile textarea {
+    padding: 10px 14px;
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+    background: var(--input-bg);
+    border: 1px solid var(--glass-border-hover);
+    outline: none;
+    resize: vertical;
+    width: 100%;
+    max-width: 440px;
+    transition: border-color 0.3s;
+}
+
+#sec-profile input:focus,
+#sec-profile textarea:focus { border-color: var(--accent); }
+
+#sec-profile input::placeholder,
+#sec-profile textarea::placeholder { color: var(--faint); }
+
+.admin-only-hint { margin-top: 0.8rem; color: var(--accent); }
+
+/* Дефолты просмотрщика */
+#sec-viewer .check-row { margin-bottom: 0.6rem; }
+
+/* Хранилище */
+.storage-stats {
+    display: flex;
+    gap: 1.6rem;
+    flex-wrap: wrap;
+    padding: 1.1rem 1.3rem;
+    margin-bottom: 0.4rem;
+}
+
+.storage-stats span {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.storage-stats div {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+}
+
+.about-card { padding: 1.3rem 1.4rem; }
+
+@media (max-width: 760px) {
+    .settings-page { grid-template-columns: 1fr; }
+    .settings-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        position: static;
+    }
+}

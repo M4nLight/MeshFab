@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="cyan">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeshFab — Settings</title>
+    <script>
+        // Тема применяется до загрузки стилей, чтобы страница не мигала
+        document.documentElement.dataset.theme = localStorage.getItem('mf_theme') || 'dark';
+        document.documentElement.dataset.accent = localStorage.getItem('mf_accent') || 'cyan';
+    </script>
+    <!-- Общие стили сайта (кнопки, формы, темы) + стили страницы настроек -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="settings.css">
+    <!-- Иконка сайта -->
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <!-- Переводы -->
+    <script src="i18n.js"></script>
+</head>
+<body>
+
+    <!-- Шапка настроек -->
+    <header class="topbar">
+        <a class="logo" href="index.html">
+            <svg class="logo-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="10,54 10,14 24,34 32,20 40,34 54,14 54,54 44,54 44,32 38,42 32,36 26,42 20,32 20,54" fill="var(--accent)" opacity="0.35"/>
+                <polygon points="10,14 24,34 10,40" fill="var(--accent)" opacity="0.9"/>
+                <polygon points="24,34 32,20 32,36 26,42" fill="var(--accent)" opacity="0.65"/>
+                <polygon points="32,20 40,34 32,36" fill="var(--accent)" opacity="0.9"/>
+                <polygon points="40,34 54,14 54,40" fill="var(--accent)" opacity="0.65"/>
+            </svg>
+            <span class="logo-text">MeshFab</span>
+        </a>
+        <span class="settings-crumb" data-i18n="sttng.crumb">/ Settings</span>
+        <div class="top-actions">
+            <a class="btn" href="index.html" data-i18n="sttng.back">← Back to site</a>
+        </div>
+    </header>
+
+    <div class="settings-page">
+
+        <!-- Левая колонка: вкладки настроек -->
+        <nav class="settings-nav">
+            <button class="snav-item active" data-sec="personalization" data-i18n="sttng.tab_pers">Personalization</button>
+            <button class="snav-item" data-sec="profile" data-i18n="sttng.tab_profile">Profile</button>
+            <button class="snav-item" data-sec="account" data-i18n="sttng.tab_account">Account</button>
+            <button class="snav-item" data-sec="language" data-i18n="sttng.tab_lang">Language</button>
+            <button class="snav-item" data-sec="viewer" data-i18n="sttng.tab_viewer">Viewer</button>
+            <button class="snav-item" data-sec="rules" data-i18n="sttng.tab_rules">Rules</button>
+            <button class="snav-item" data-sec="storage" data-i18n="sttng.tab_storage">Storage</button>
+            <button class="snav-item" data-sec="about" data-i18n="sttng.tab_about">About</button>
+        </nav>
+
+        <!-- Правая колонка: содержимое вкладок -->
+        <div class="settings-content">
+
+            <!-- ================= Personalization: тема + акцент ================= -->
+            <section class="ssec active" id="sec-personalization">
+                <h2 data-i18n="sttng.pers_title">Personalization</h2>
+
+                <h5 data-i18n="sttng.theme">Theme</h5>
+                <div class="theme-cards">
+                    <button class="theme-card" data-theme-set="dark" type="button">
+                        <span class="theme-preview dark-p"></span>
+                        <span><span data-i18n="sttng.theme_dark">Dark</span> <em class="current-mark hidden">· <span data-i18n="sttng.current">current</span></em></span>
+                    </button>
+                    <button class="theme-card" data-theme-set="light" type="button">
+                        <span class="theme-preview light-p"></span>
+                        <span><span data-i18n="sttng.theme_light">Light</span> <em class="current-mark hidden">· <span data-i18n="sttng.current">current</span></em></span>
+                    </button>
+                </div>
+
+                <h5 data-i18n="sttng.accent">Accent color</h5>
+                <div class="accent-row">
+                    <button class="accent-dot" data-accent-set="cyan" style="--c:#1caad9" title="Cyan"></button>
+                    <button class="accent-dot" data-accent-set="purple" style="--c:#8b5cf6" title="Purple"></button>
+                    <button class="accent-dot" data-accent-set="green" style="--c:#22c58b" title="Green"></button>
+                    <button class="accent-dot" data-accent-set="orange" style="--c:#f59e0b" title="Orange"></button>
+                </div>
+            </section>
+
+            <!-- ================= Profile: кастомизация профиля ================= -->
+            <section class="ssec" id="sec-profile">
+                <h2 data-i18n="sttng.profile_title">Profile</h2>
+
+                <!-- Что видит незалогиненный: только предложение зарегистрироваться -->
+                <div class="guest-note hidden" id="profile-guest">
+                    <p data-i18n="sttng.guest_note">You don't have an account yet. Sign up to customize your profile.</p>
+                    <a class="btn primary" href="index.html" data-i18n="nav.signup">Sign up</a>
+                </div>
+
+                <!-- Форма кастомизации (только для залогиненных) -->
+                <div class="hidden" id="profile-editor">
+                    <div class="acc-card glass">
+                        <div class="profile-avatar" id="pf-preview-avatar">M</div>
+                        <div class="acc-info">
+                            <div class="acc-name" id="pf-preview-name">—</div>
+                            <div class="acc-sub">@<span id="pf-preview-user">—</span></div>
+                        </div>
+                    </div>
+
+                    <h5 data-i18n="sttng.avatar">Avatar</h5>
+                    <div class="avatar-controls">
+                        <label class="btn" id="pf-avatar-btn">
+                            <span data-i18n="sttng.avatar_upload">Upload picture</span>
+                            <input type="file" id="pf-avatar-input" accept="image/*" hidden>
+                        </label>
+                        <button class="btn ghost" id="pf-avatar-remove" data-i18n="sttng.avatar_remove" type="button">Remove picture</button>
+                    </div>
+                    <h5 data-i18n="sttng.avatar_color">Avatar color</h5>
+                    <div class="accent-row" id="pf-color-row">
+                        <button class="accent-dot" data-avatar-color="cyan" style="--c:#1caad9"></button>
+                        <button class="accent-dot" data-avatar-color="purple" style="--c:#8b5cf6"></button>
+                        <button class="accent-dot" data-avatar-color="green" style="--c:#22c58b"></button>
+                        <button class="accent-dot" data-avatar-color="orange" style="--c:#f59e0b"></button>
+                        <button class="accent-dot" data-avatar-color="pink" style="--c:#ec4899"></button>
+                        <button class="accent-dot" data-avatar-color="slate" style="--c:#64748b"></button>
+                    </div>
+
+                    <h5 data-i18n="sttng.display_name">Display name</h5>
+                    <input type="text" id="pf-name-input" maxlength="24" data-i18n-ph="sttng.display_name_ph" placeholder="Shown instead of your username">
+
+                    <h5 data-i18n="sttng.bio">Bio</h5>
+                    <textarea id="pf-bio-input" rows="3" maxlength="200" data-i18n-ph="sttng.bio_ph" placeholder="A few words about you and your 3D work…"></textarea>
+
+                    <button class="btn primary" id="pf-save" data-i18n="sttng.save_profile" type="button" style="margin-top:0.9rem">Save profile</button>
+                </div>
+            </section>
+
+            <!-- ================= Account ================= -->
+            <section class="ssec" id="sec-account">
+                <h2 data-i18n="sttng.account_title">Account</h2>
+
+                <!-- Что видит незалогиненный -->
+                <div class="guest-note hidden" id="account-guest">
+                    <p data-i18n="sttng.guest_note">You don't have an account yet. Sign up to customize your profile.</p>
+                    <a class="btn primary" href="index.html" data-i18n="nav.signup">Sign up</a>
+                </div>
+
+                <!-- Что видит залогиненный -->
+                <div class="hidden" id="account-editor">
+                    <div class="acc-card glass">
+                        <div class="profile-avatar" id="st-avatar">M</div>
+                        <div class="acc-info">
+                            <div class="acc-name" id="st-name">—</div>
+                            <div class="acc-sub" id="st-joined"></div>
+                        </div>
+                    </div>
+
+                    <!-- Смена пароля -->
+                    <h5 data-i18n="sttng.change_pass">Change password</h5>
+                    <form id="st-pass-form" class="stack-form">
+                        <input type="password" id="st-old-pass" data-i18n-ph="sttng.old_pass" placeholder="Current password" required>
+                        <input type="password" id="st-new-pass" data-i18n-ph="sttng.new_pass" placeholder="New password (min 8)" minlength="8" required>
+                        <button class="btn primary" data-i18n="sttng.save_pass" type="submit">Save password</button>
+                    </form>
+
+                    <!-- Выход / удаление аккаунта -->
+                    <div class="danger-row">
+                        <button class="btn" id="st-logout" data-i18n="profile.logout" type="button">Log out</button>
+                        <button class="btn danger" id="st-delete-acc" data-i18n="sttng.delete_acc" type="button">Delete account</button>
+                    </div>
+                    <p class="hint" data-i18n="sttng.account_note">Passwords are stored as PBKDF2-SHA256 hashes (150,000 iterations, unique salt) — never in plain text. All data lives only in this browser.</p>
+                </div>
+            </section>
+
+            <!-- ================= Language: 4 языка ================= -->
+            <section class="ssec" id="sec-language">
+                <h2 data-i18n="sttng.lang_title">Language</h2>
+                <p class="hint" data-i18n="sttng.lang_hint">Applies to the whole site instantly.</p>
+                <div class="lang-grid">
+                    <button class="lang-card" data-lang-set="en" type="button">
+                        <span class="lang-flag">🇺🇸</span>
+                        <span>English</span>
+                        <em class="lang-sub">International</em>
+                    </button>
+                    <button class="lang-card" data-lang-set="ru" type="button">
+                        <span class="lang-flag">🇷🇺</span>
+                        <span>Русский</span>
+                        <em class="lang-sub">СНГ</em>
+                    </button>
+                    <button class="lang-card" data-lang-set="es" type="button">
+                        <span class="lang-flag">🇪🇸</span>
+                        <span>Español</span>
+                        <em class="lang-sub">España &amp; Latinoamérica</em>
+                    </button>
+                    <button class="lang-card" data-lang-set="zh" type="button">
+                        <span class="lang-flag">🇨🇳</span>
+                        <span>中文</span>
+                        <em class="lang-sub">中国 &amp; Asia</em>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ================= Viewer: дефолты просмотрщика ================= -->
+            <section class="ssec" id="sec-viewer">
+                <h2 data-i18n="sttng.viewer_title">Viewer</h2>
+                <p class="hint" data-i18n="sttng.viewer_hint">Default state of the viewer every time you open a model.</p>
+
+                <label class="check-row"><input type="checkbox" id="vd-nopost"><span data-i18n="panel.nopost">No post-processing</span></label>
+                <label class="check-row"><input type="checkbox" id="vd-autorotate"><span data-i18n="panel.autorotate">Auto-rotate</span></label>
+                <label class="check-row"><input type="checkbox" id="vd-wireframe"><span data-i18n="panel.wireframe">Wireframe on open</span></label>
+                <label class="check-row"><input type="checkbox" id="vd-normals"><span data-i18n="panel.normals">Vertex normals on open</span></label>
+                <label class="check-row"><input type="checkbox" id="vd-bones"><span data-i18n="panel.show_bones">Show bones on open</span></label>
+
+                <button class="btn primary" id="vd-save" data-i18n="sttng.save_defaults" type="button" style="margin-top:0.8rem">Save viewer defaults</button>
+            </section>
+
+            <!-- ================= Rules: правила сообщества ================= -->
+            <section class="ssec" id="sec-rules">
+                <h2 data-i18n="sttng.rules_title">Community Rules</h2>
+                <p class="hint" data-i18n="sttng.rules_hint">Every upload requires confirming these rules. No exceptions.</p>
+                <div class="rules-list" id="rules-list"></div>
+            </section>
+
+            <!-- ================= Storage: только для админа ================= -->
+            <section class="ssec" id="sec-storage">
+                <h2 data-i18n="sttng.storage_title">Storage</h2>
+
+                <!-- Незалогиненным — только предложение зарегистрироваться -->
+                <div class="guest-note hidden" id="storage-guest">
+                    <p data-i18n="sttng.guest_note">You don't have an account yet. Sign up to customize your profile.</p>
+                    <a class="btn primary" href="index.html" data-i18n="nav.signup">Sign up</a>
+                </div>
+
+                <div class="hidden" id="storage-editor">
+                    <p class="hint" data-i18n="sttng.storage_hint">All models, accounts and settings live only in this browser.</p>
+
+                    <div class="storage-stats glass">
+                        <div><span id="st-models-count">0</span> <span data-i18n="sttng.st_models">models stored</span></div>
+                        <div><span id="st-bytes">0 KB</span> <span data-i18n="sttng.st_bytes">of 3D files</span></div>
+                        <div><span id="st-users-count">0</span> <span data-i18n="sttng.st_users">accounts on this device</span></div>
+                    </div>
+
+                    <!-- Опасные кнопки: только администратор -->
+                    <div class="danger-row" id="storage-admin-zone">
+                        <button class="btn" id="st-clear-models" data-i18n="sttng.clear_models" type="button">Delete all uploaded models</button>
+                        <button class="btn danger" id="st-reset-all" data-i18n="sttng.full_reset" type="button">Full reset (everything)</button>
+                    </div>
+                    <p class="hint admin-only-hint hidden" id="storage-admin-hint" data-i18n="sttng.admin_only">Deleting everything is allowed only for the admin account (MeshFab).</p>
+                </div>
+            </section>
+
+            <!-- ================= About ================= -->
+            <section class="ssec" id="sec-about">
+                <h2 data-i18n="sttng.about_title">About</h2>
+                <div class="glass about-card">
+                    <div class="acc-name">MeshFab</div>
+                    <p class="hint" style="margin-top:0.4rem" data-i18n="sttng.about_text">
+                        A tiny parody of Sketchfab. Publish 3D models, view them with bones,
+                        wireframe, vertex normals and raw textures — everything runs locally in your
+                        browser, nothing is ever uploaded to a server.
+                    </p>
+                    <p class="hint" data-i18n="sttng.about_ver">Version 0.4 · Made with three.js &amp; model-viewer</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="settings.js"></script>
+</body>
+</html>
