@@ -65,6 +65,8 @@ const I18N = {
         'toast.short_pass': 'Password must be at least 8 characters',
         'toast.pass_mismatch': 'Passwords do not match',
         'toast.signin_like': 'Sign in to like models',
+        'toast.signin_report': 'Sign in to report models',
+        'comments.del': 'Delete',
         'toast.signin_upload': 'Sign in or create an account to upload models',
         'toast.locked': 'Too many attempts. Try again in {s} s',
         'toast.file_invalid': 'Only .glb or .gltf files are supported',
@@ -129,6 +131,8 @@ const I18N = {
         'toast.short_pass': 'Пароль должен быть минимум 8 символов',
         'toast.pass_mismatch': 'Пароли не совпадают',
         'toast.signin_like': 'Войди, чтобы ставить лайки',
+        'toast.signin_report': 'Войди, чтобы отправить жалобу',
+        'comments.del': 'Удалить',
         'toast.signin_upload': 'Чтобы выложить модель, войди или зарегистрируйся',
         'toast.locked': 'Слишком много попыток. Подожди {s} с',
         'toast.file_invalid': 'Поддерживаются только файлы .glb и .gltf',
@@ -193,6 +197,8 @@ const I18N = {
         'toast.short_pass': 'La contraseña debe tener al menos 8 caracteres',
         'toast.pass_mismatch': 'Las contraseñas no coinciden',
         'toast.signin_like': 'Inicia sesión para dar me gusta',
+        'toast.signin_report': 'Inicia sesión para reportar',
+        'comments.del': 'Borrar',
         'toast.signin_upload': 'Inicia sesión o crea una cuenta para subir modelos',
         'toast.locked': 'Demasiados intentos. Espera {s} s',
         'toast.file_invalid': 'Solo se admiten archivos .glb o .gltf',
@@ -257,6 +263,8 @@ const I18N = {
         'toast.short_pass': '密码至少需要 8 个字符',
         'toast.pass_mismatch': '两次密码不一致',
         'toast.signin_like': '登录后才能点赞',
+        'toast.signin_report': '登录后才能举报',
+        'comments.del': '删除',
         'toast.signin_upload': '登录或注册后才能上传模型',
         'toast.locked': '尝试次数过多，请在 {s} 秒后重试',
         'toast.file_invalid': '仅支持 .glb 或 .gltf 文件',
@@ -477,6 +485,112 @@ const STTNG_I18N = {
 
 // Вливаем переводы настроек в общий словарь
 for (const lang in STTNG_I18N) Object.assign(I18N[lang], STTNG_I18N[lang]);
+
+// ================= Фичеры (уровни 1–5) =================
+
+const FEAT_I18N = {
+    en: {
+        'feat.title': 'Featured by MeshFab Studio',
+        'feat.admin_model': 'Featured level (model)',
+        'feat.admin_account': 'Featured level (account)',
+        'feat.none': 'Remove feature',
+        'feat.saved': 'Featured level saved',
+    },
+    ru: {
+        'feat.title': 'Фичер от MeshFab Studio',
+        'feat.admin_model': 'Уровень фичера (модель)',
+        'feat.admin_account': 'Уровень фичера (аккаунт)',
+        'feat.none': 'Убрать фичер',
+        'feat.saved': 'Уровень фичера сохранён',
+    },
+    es: {
+        'feat.title': 'Destacado por MeshFab Studio',
+        'feat.admin_model': 'Nivel de destacado (modelo)',
+        'feat.admin_account': 'Nivel de destacado (cuenta)',
+        'feat.none': 'Quitar destacado',
+        'feat.saved': 'Nivel de destacado guardado',
+    },
+    zh: {
+        'feat.title': 'MeshFab Studio 推荐',
+        'feat.admin_model': '推荐等级（模型）',
+        'feat.admin_account': '推荐等级（账号）',
+        'feat.none': '取消推荐',
+        'feat.saved': '推荐等级已保存',
+    },
+};
+
+for (const lang in FEAT_I18N) Object.assign(I18N[lang], FEAT_I18N[lang]);
+
+// ================= Уведомления, комментарии, жалобы, достижения =================
+
+const NOTIF_I18N = {
+    en: {
+        'nav.notifs': 'Notifications',
+        'notifs.title': 'Notifications', 'notifs.clear': 'Clear all', 'notifs.empty': 'Nothing here yet',
+        'notifs.comment': '{who} wrote on your model "{model}"',
+        'notifs.report': '{who} reported model "{model}"',
+        'ach.views': 'Your model "{model}" reached {n} views!',
+        'ach.likes': 'Your model "{model}" reached {n} likes!',
+        'comments.title': 'Comments', 'comments.ph': 'Write a comment…', 'comments.send': 'Send',
+        'comments.none': 'No comments yet', 'comments.signin': 'Sign in to comment',
+        'model.report': 'Report',
+        'report.title': 'Report model',
+        'report.hint': 'Something breaks the rules? Tell the admin.',
+        'report.ph': 'What is wrong with this model? (18+, wrong license…)',
+        'report.send': 'Send report',
+        'report.sent': 'Report sent! The admin will check it.',
+    },
+    ru: {
+        'nav.notifs': 'Уведомления',
+        'notifs.title': 'Уведомления', 'notifs.clear': 'Очистить всё', 'notifs.empty': 'Пока ничего нет',
+        'notifs.comment': '{who} написал на твоей модели «{model}»',
+        'notifs.report': '{who} пожаловался на модель «{model}»',
+        'ach.views': 'Твоя модель «{model}» набрала {n} просмотров!',
+        'ach.likes': 'Твоя модель «{model}» набрала {n} лайков!',
+        'comments.title': 'Комментарии', 'comments.ph': 'Напиши комментарий…', 'comments.send': 'Отправить',
+        'comments.none': 'Комментариев пока нет', 'comments.signin': 'Войди, чтобы комментировать',
+        'model.report': 'Жалоба',
+        'report.title': 'Жалоба на модель',
+        'report.hint': 'Что-то нарушает правила? Сообщи админу.',
+        'report.ph': 'Что не так с этой моделью? (18+, чужая лицензия…)',
+        'report.send': 'Отправить жалобу',
+        'report.sent': 'Жалоба отправлена! Админ её проверит.',
+    },
+    es: {
+        'nav.notifs': 'Notificaciones',
+        'notifs.title': 'Notificaciones', 'notifs.clear': 'Borrar todo', 'notifs.empty': 'Aún no hay nada',
+        'notifs.comment': '{who} escribió en tu modelo «{model}»',
+        'notifs.report': '{who} reportó el modelo «{model}»',
+        'ach.views': '¡Tu modelo «{model}» alcanzó {n} vistas!',
+        'ach.likes': '¡Tu modelo «{model}» alcanzó {n} me gusta!',
+        'comments.title': 'Comentarios', 'comments.ph': 'Escribe un comentario…', 'comments.send': 'Enviar',
+        'comments.none': 'Aún no hay comentarios', 'comments.signin': 'Inicia sesión para comentar',
+        'model.report': 'Reportar',
+        'report.title': 'Reportar modelo',
+        'report.hint': '¿Algo incumple las normas? Avísale al administrador.',
+        'report.ph': '¿Qué pasa con este modelo? (+18, licencia ajena…)',
+        'report.send': 'Enviar reporte',
+        'report.sent': '¡Reporte enviado! El administrador lo revisará.',
+    },
+    zh: {
+        'nav.notifs': '通知',
+        'notifs.title': '通知', 'notifs.clear': '全部清除', 'notifs.empty': '暂无内容',
+        'notifs.comment': '{who} 在你的模型「{model}」下留言了',
+        'notifs.report': '{who} 举报了模型「{model}」',
+        'ach.views': '你的模型「{model}」达到了 {n} 次浏览！',
+        'ach.likes': '你的模型「{model}」达到了 {n} 个赞！',
+        'comments.title': '评论', 'comments.ph': '写条评论…', 'comments.send': '发送',
+        'comments.none': '暂无评论', 'comments.signin': '登录后才能评论',
+        'model.report': '举报',
+        'report.title': '举报模型',
+        'report.hint': '有内容违反规则？告诉管理员。',
+        'report.ph': '这个模型有什么问题？（18+、许可问题…）',
+        'report.send': '发送举报',
+        'report.sent': '举报已发送！管理员会检查。',
+    },
+};
+
+for (const lang in NOTIF_I18N) Object.assign(I18N[lang], NOTIF_I18N[lang]);
 
 // ================= API =================
 

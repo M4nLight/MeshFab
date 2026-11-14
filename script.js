@@ -110,6 +110,83 @@ function currentUser() {
 
 const isAdmin = () => { const u = currentUser(); return !!(u && u.admin); };
 
+// ================= Уведомления (в localStorage, у каждого свои) =================
+
+// У каждого юзера свой список: mf_notifs_<имя>. Уведомления видит только он —
+// сайт работает по островкам (все данные живут в браузере).
+const notifsKey = (user) => 'mf_notifs_' + user.toLowerCase();
+
+function getNotifs(user) {
+    return JSON.parse(localStorage.getItem(notifsKey(user || (currentUser() || {}).user)) || '[]');
+}
+
+function saveNotifs(user, list) {
+    localStorage.setItem(notifsKey(user), JSON.stringify(list));
+    updateBellBadge();
+}
+
+// Добавить уведомление юзеру (user — кому)
+function notify(user, obj) {
+    const list = getNotifs(user);
+    list.unshift({
+        id: Date.now() + Math.random().toString(36).slice(2, 7),
+        read: false,
+        date: Date.now(),
+        ...obj,
+    });
+    if (list.length > 50) list.length = 50; // не раздувать память
+    saveNotifs(user, list);
+}
+
+const unreadNotifs = (user) => getNotifs(user).filter(n => !n.read).length;
+
+// Обновляет красную цифру на колокольчике
+function updateBellBadge() {
+    const el = document.getElementById('notif-count');
+    if (!el) return;
+    const me = currentUser();
+    const n = me ? unreadNotifs(me.user) : 0;
+    el.textContent = n > 99 ? '99+' : n;
+    el.classList.toggle('hidden', n === 0);
+}
+
+// ================= Жалобы (админ видит уведомление) =================
+
+const REPORTS_KEY = 'mf_reports';
+const getReports = () => JSON.parse(localStorage.getItem(REPORTS_KEY) || '[]');
+const saveReports = (list) => localStorage.setItem(REPORTS_KEY, JSON.stringify(list));
+
+// ================= Достижения моделей (просмотры / лайки) =================
+
+const ACH_VIEWS = [10, 50, 100, 500, 1000];
+const ACH_LIKES = [5, 10, 25, 50, 100];
+
+// Проверяет, перевалила ли модель новый порог. Если да — автор получает
+// уведомление («100 просмотров!»). Возвращает true, если надо сохранить модель.
+function checkAchievements(m) {
+    m.ach = m.ach || { views: 0, likes: 0 };
+    let changed = false;
+    for (const n of ACH_VIEWS) {
+        if ((m.views || 0) >= n && m.ach.views < n) {
+            m.ach.views = n;
+            changed = true;
+            if (m.author !== (currentUser() || {}).user) {
+                notify(m.author, { type: 'ach', text: t('ach.views', { model: m.name, n }), modelId: m.id });
+            }
+        }
+    }
+    for (const n of ACH_LIKES) {
+        if ((m.likes || 0) >= n && m.ach.likes < n) {
+            m.ach.likes = n;
+            changed = true;
+            if (m.author !== (currentUser() || {}).user) {
+                notify(m.author, { type: 'ach', text: t('ach.likes', { model: m.name, n }), modelId: m.id });
+            }
+        }
+    }
+    return changed;
+}
+
 // Отображаемое имя автора (кастомизация профиля)
 function authorName(username) {
     const u = getUsers().find(x => x.user.toLowerCase() === username.toLowerCase());
@@ -229,8 +306,29 @@ function renderAuthArea() {
     const u = currentUser();
     if (u) {
         area.innerHTML = `
+            <div class="notif-wrap">
+                <button class="notif-btn" id="notif-btn" type="button" title="${esc(t('nav.notifs'))}">
+                    <svg><use href="#i-bell"/></svg>
+                    <span class="notif-count hidden" id="notif-count">0</span>
+                </button>
+                <div class="notif-menu hidden" id="notif-menu"></div>
+            </div>
             <button class="btn user-chip" id="user-chip" type="button" title="My profile">${esc(authorName(u.user))}</button>`;
         document.getElementById('user-chip').addEventListener('click', () => openProfile(u.user));
+        document.getElementById('notif-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const menu = document.getElementById('notif-menu');
+            menu.classList.toggle('hidden');
+            if (!menu.classList.contains('hidden')) renderNotifMenu();
+        });
+        // Клик мимо меню — закрыть его
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('notif-menu');
+            if (menu && !menu.classList.contains('hidden') && !e.target.closest('.notif-wrap')) {
+                menu.classList.add('hidden');
+            }
+        });
+        updateBellBadge();
     } else {
         area.innerHTML = `
             <button class="btn" id="login-open" data-i18n="nav.signin" type="button">Sign in</button>
@@ -239,6 +337,57 @@ function renderAuthArea() {
         document.getElementById('signup-open').addEventListener('click', () => openAuthModal('register'));
         applyI18n(area);
     }
+}
+
+// ================= Меню уведомлений =================
+
+function renderNotifMenu() {
+    const me = currentUser();
+    const menu = document.getElementById('notif-menu');
+    if (!me || !menu) return;
+    const list = getNotifs(me.user);
+    menu.innerHTML = `
+        <div class="notif-menu-head">
+            <span>${esc(t('notifs.title'))}</span>
+            ${list.length ? `<button class="notif-clear" id="notif-clear" type="button">${esc(t('notifs.clear'))}</button>` : ''}
+        </div>
+        ${list.length
+            ? list.map(n => `
+                <button class="notif-item ${n.read ? '' : 'unread'}" data-nid="${esc(n.id)}" type="button">
+                    ${esc(n.text)}
+                    <span class="notif-date">${fmtDate(n.date)}</span>
+                </button>`).join('')
+            : `<div class="notif-empty">${esc(t('notifs.empty'))}</div>`}`;
+
+    const clear = document.getElementById('notif-clear');
+    if (clear) clear.addEventListener('click', () => {
+        saveNotifs(me.user, []);
+        renderNotifMenu();
+    });
+
+    menu.querySelectorAll('.notif-item').forEach(btn =>
+        btn.addEventListener('click', () => openNotif(btn.dataset.nid)));
+}
+
+// Клик по уведомлению: пометить прочитанным, жалобу — обработанной, открыть модель
+async function openNotif(nid) {
+    const me = currentUser();
+    if (!me) return;
+    const list = getNotifs(me.user);
+    const n = list.find(x => x.id === nid);
+    if (!n) return;
+    if (!n.read) {
+        n.read = true;
+        saveNotifs(me.user, list);
+    }
+    // Жалоба считается просмотренной — убираем из списка админа
+    if (n.type === 'report' && n.reportId) {
+        const reps = getReports().filter(r => r.id !== n.reportId);
+        saveReports(reps);
+    }
+    document.getElementById('notif-menu').classList.add('hidden');
+    updateBellBadge();
+    if (n.modelId) await openModel(n.modelId);
 }
 
 // ================= Модалка входа / регистрации =================
@@ -355,7 +504,10 @@ function renderGrid(gridEl, models) {
                 environment-image="neutral">
             </model-viewer>
             <div class="card-info">
-                <div class="card-name">${esc(m.name)}</div>
+                <div class="card-name-row">
+                    <div class="card-name ${m.feat >= 3 ? 'feat-name-' + m.feat : ''}">${esc(m.name)}</div>
+                    ${m.feat >= 1 ? `<span class="mini-feat" data-level="${m.feat}" title="${esc(t('feat.title'))}"><svg><use href="#i-flame"/></svg></span>` : ''}
+                </div>
                 <div class="card-author">${esc(authorName(m.author))}</div>
                 <div class="card-meta">
                     <span title="Views">
@@ -393,12 +545,24 @@ document.getElementById('cat-filter').addEventListener('change', (e) => {
 
 // ================= Страница модели =================
 
+// Просмотр засчитывается один раз на устройство: id моделей, которые уже смотрели
+const seenKey = 'mf_seen';
+const seenModels = () => JSON.parse(localStorage.getItem(seenKey) || '[]');
+const markModelSeen = (id) => {
+    const arr = seenModels();
+    if (!arr.includes(id)) {
+        arr.push(id);
+        localStorage.setItem(seenKey, JSON.stringify(arr));
+    }
+};
+
 const stageWrap = document.getElementById('stage-wrap');
 const viewerPanel = document.getElementById('viewer-panel');
 const texViewer = document.getElementById('tex-viewer');
 const texCanvas = document.getElementById('tex-canvas');
 let stage = null;      // three.js просмотрщик (создаётся лениво)
 let currentModel = null;
+let currentProfileUser = null; // чей профиль открыт (для фичера аккаунта)
 
 // Кнопка справа снизу открывает/закрывает левую панель настроек
 document.getElementById('btn-panel').addEventListener('click', () => {
@@ -503,14 +667,23 @@ async function openModel(id) {
     const m = all.find(x => x.id === id);
     if (!m) return;
 
-    // Счётчик просмотров
-    m.views = (m.views || 0) + 1;
-    await dbPut(m);
+    // Счётчик просмотров: один раз на устройство, повторные заходы не считаются
+    if (!seenModels().includes(id)) {
+        m.views = (m.views || 0) + 1;
+        markModelSeen(id);
+        await dbPut(m);
+    }
+    // Достижения по просмотрам (уведомление автору о «100 просмотров» и т.д.)
+    if (checkAchievements(m)) await dbPut(m);
     currentModel = m;
 
     // Заполняем панель справа
     document.getElementById('md-name').textContent = m.name;
     document.getElementById('md-author').textContent = t('model.by', { name: authorName(m.author) });
+
+    // Фичер модели: бейдж у названия + панель выбора уровня (только админ)
+    renderFeatBadge(m);
+    document.getElementById('md-admin-tools').classList.toggle('hidden', !isAdmin());
     document.getElementById('md-desc').textContent = m.desc || t('model.no_desc');
     document.getElementById('md-views').textContent = t('model.views', { n: m.views });
     document.getElementById('md-likes').textContent = t('model.likes', { n: m.likes || 0 });
@@ -544,6 +717,13 @@ async function openModel(id) {
     const me = currentUser();
     const canDelete = me && (me.user === m.author || me.admin);
     document.getElementById('md-delete').classList.toggle('hidden', !canDelete);
+
+    // Жаловаться на свою модель (или админом) бессмысленно — прячем кнопку
+    document.getElementById('md-report').classList.toggle('hidden', Boolean(me && (me.user === m.author || me.admin)));
+
+    // Комментарии под моделью
+    renderComments();
+    updateCommentArea();
 
     // Кнопка «Like»
     updateLikeBtn();
@@ -612,6 +792,8 @@ function updateLikeBtn() {
         }
         saveMyLikes(likes);
         await dbPut(currentModel);
+        // Достижения по лайкам («10 лайков!» и т.д.)
+        if (checkAchievements(currentModel)) await dbPut(currentModel);
         document.getElementById('md-likes').textContent = t('model.likes', { n: currentModel.likes || 0 });
         updateLikeBtn();
         if (document.getElementById('view-home').classList.contains('active')) renderHome();
@@ -633,6 +815,179 @@ document.getElementById('md-delete').addEventListener('click', async () => {
     showView('home');
 });
 
+// ================= Фичеры (уровни 1–5, задаёт админ) =================
+
+// Рисует бейдж огня у названия модели + подсвечивает кнопки админа
+function renderFeatBadge(m) {
+    const badge = document.getElementById('md-feat');
+    const name = document.getElementById('md-name');
+    [3, 4, 5].forEach(l => name.classList.remove('feat-name-' + l));
+    if (m.feat >= 1) {
+        badge.classList.remove('hidden');
+        badge.dataset.level = m.feat;
+        if (m.feat >= 3) name.classList.add('feat-name-' + m.feat);
+    } else {
+        badge.classList.add('hidden');
+    }
+    syncFeatPicker('md-feat-picker', m.feat || 0);
+}
+
+// Подсветка активной кнопки уровня в админ-панели
+function syncFeatPicker(pickerId, level) {
+    const picker = document.getElementById(pickerId);
+    if (!picker) return;
+    picker.querySelectorAll('.feat-pick').forEach(b =>
+        b.classList.toggle('active', parseInt(b.dataset.feat, 10) === level));
+}
+
+// Клик по огоньку уровня — сохранить фичер модели
+document.getElementById('md-feat-picker').addEventListener('click', async (e) => {
+    const btn = e.target.closest('.feat-pick');
+    if (!btn || !currentModel) return;
+    currentModel.feat = parseInt(btn.dataset.feat, 10);
+    await dbPut(currentModel);
+    renderFeatBadge(currentModel);
+    toast(t('feat.saved'));
+    renderHome(); // перерисовать карточки с огоньком
+});
+
+// Клик по огоньку уровня — сохранить фичер аккаунта
+document.getElementById('pf-feat-picker').addEventListener('click', (e) => {
+    const btn = e.target.closest('.feat-pick');
+    if (!btn || !currentProfileUser) return;
+    const users = getUsers();
+    const u = users.find(x => x.user.toLowerCase() === currentProfileUser.toLowerCase());
+    if (!u) return;
+    u.feat = parseInt(btn.dataset.feat, 10);
+    saveUsers(users);
+    renderProfileFeat(u);
+    toast(t('feat.saved'));
+});
+
+// Огненное кольцо за аватаром профиля
+function renderProfileFeat(user) {
+    const ring = document.getElementById('pf-ring');
+    ring.classList.remove('feat-1', 'feat-2', 'feat-3', 'feat-4', 'feat-5');
+    const lvl = (user && user.feat) || 0;
+    if (lvl >= 1) ring.classList.add('feat-' + lvl);
+    syncFeatPicker('pf-feat-picker', lvl);
+    document.getElementById('pf-admin-tools').classList.toggle('hidden', !isAdmin());
+}
+
+// ================= Комментарии под моделью =================
+
+function renderComments() {
+    const m = currentModel;
+    if (!m) return;
+    const list = document.getElementById('comments-list');
+    const empty = document.getElementById('comments-empty');
+    const comments = m.comments || [];
+
+    list.innerHTML = comments.map(c => `
+        <div class="comment" data-cid="${esc(c.id)}">
+            <div class="comment-head">
+                <button class="comment-author" data-user="${esc(c.by)}" type="button">${esc(authorName(c.by))}</button>
+                <span class="comment-date">${fmtDate(c.date)}</span>
+                ${(currentUser() && (currentUser().user === c.by || currentUser().admin))
+                    ? `<button class="comment-del" type="button">${esc(t('comments.del'))}</button>` : ''}
+            </div>
+            <div class="comment-text">${esc(c.text)}</div>
+        </div>`).join('');
+
+    empty.classList.toggle('hidden', comments.length > 0);
+
+    // Клик по имени автора комментария — открыть его профиль
+    list.querySelectorAll('.comment-author').forEach(b =>
+        b.addEventListener('click', () => openProfile(b.dataset.user)));
+    // Крестик — удалить свой (или админ любой)
+    list.querySelectorAll('.comment-del').forEach(b =>
+        b.addEventListener('click', async () => {
+            const cid = b.closest('.comment').dataset.cid;
+            currentModel.comments = currentModel.comments.filter(c => c.id !== cid);
+            await dbPut(currentModel);
+            renderComments();
+        }));
+}
+
+// Форма комментария: гостю — подсказка, юзеру — отправка
+function updateCommentArea() {
+    const me = currentUser();
+    document.querySelector('#comment-form button[type=submit]').disabled = !me;
+    document.getElementById('comment-input').disabled = !me;
+    document.getElementById('comments-guest').classList.toggle('hidden', !!me);
+    if (!me) document.getElementById('comments-list').innerHTML = '';
+}
+
+document.getElementById('comment-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const me = currentUser();
+    if (!me || !currentModel) return;
+    const input = document.getElementById('comment-input');
+    const text = input.value.trim();
+    if (!text) return;
+    currentModel.comments = currentModel.comments || [];
+    currentModel.comments.push({
+        id: Date.now() + Math.random().toString(36).slice(2, 7),
+        by: me.user,
+        text,
+        date: Date.now(),
+    });
+    await dbPut(currentModel);
+    input.value = '';
+    renderComments();
+    // Автор модели получает уведомление (если комментирует не он сам)
+    if (currentModel.author !== me.user) {
+        notify(currentModel.author, {
+            type: 'comment',
+            text: t('notifs.comment', { who: authorName(me.user), model: currentModel.name }),
+            modelId: currentModel.id,
+        });
+    }
+});
+
+// ================= Жалоба на модель (модалка) =================
+
+const reportModal = document.getElementById('report-modal');
+
+document.getElementById('md-report').addEventListener('click', () => {
+    if (!currentModel) return;
+    if (!currentUser()) return toast(t('toast.signin_report'));
+    document.getElementById('report-text').value = '';
+    reportModal.classList.remove('hidden');
+});
+
+document.getElementById('report-close').addEventListener('click', () => reportModal.classList.add('hidden'));
+reportModal.addEventListener('click', (e) => {
+    if (e.target === reportModal) reportModal.classList.add('hidden');
+});
+
+document.getElementById('report-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const me = currentUser();
+    if (!me || !currentModel) return;
+    const id = Date.now() + Math.random().toString(36).slice(2, 7);
+    const reports = getReports();
+    reports.push({
+        id,
+        modelId: currentModel.id,
+        modelName: currentModel.name,
+        by: me.user,
+        text: document.getElementById('report-text').value.trim(),
+        date: Date.now(),
+    });
+    saveReports(reports);
+    // Все админы получают уведомление о жалобе
+    getUsers().filter(u => u.admin).forEach(admin =>
+        notify(admin.user, {
+            type: 'report',
+            reportId: id,
+            text: t('notifs.report', { who: authorName(me.user), model: currentModel.name }),
+            modelId: currentModel.id,
+        }));
+    reportModal.classList.add('hidden');
+    toast(t('report.sent'));
+});
+
 // ================= Профиль =================
 
 // Цвета аватара (используются и в Sttng, и здесь)
@@ -649,6 +1004,7 @@ async function openProfile(userName) {
     const user = getUsers().find(u => u.user.toLowerCase() === userName.toLowerCase());
     const pf = (user && user.profile) || {};
     const displayName = (user && pf.name) || userName;
+    currentProfileUser = userName;
 
     document.getElementById('pf-name').textContent = displayName;
     document.getElementById('pf-bio').textContent = pf.bio || '';
@@ -681,6 +1037,10 @@ async function openProfile(userName) {
 
     document.getElementById('profile-empty').classList.toggle('hidden', mine.length > 0);
     renderGrid(document.getElementById('profile-grid'), mine);
+
+    // Фичер аккаунта: огонь за аватаром + панель выбора уровня (только админ)
+    renderProfileFeat(user);
+
     showView('profile');
 }
 

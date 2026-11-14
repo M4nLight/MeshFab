@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark" data-accent="cyan">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeshFab — демо фичеров 1–5</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+</head>
+<body>
+
+    <!-- Тот же SVG-спрайт, что и на сайте: иконка огня -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-flame" viewBox="0 0 24 24">
+            <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
+        </symbol>
+    </svg>
+
+    <main style="max-width:960px;margin:0 auto;padding:1rem 1.2rem 3rem">
+
+        <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:1.5rem">
+            <h2 style="font-size:1.3rem;letter-spacing:1px;margin-right:auto">🔥 Демо фичеров 1–5</h2>
+            <button class="glass-btn" onclick="document.documentElement.dataset.theme='dark'" type="button">🌙 Тёмная</button>
+            <button class="glass-btn" onclick="document.documentElement.dataset.theme='light'" type="button">☀️ Светлая</button>
+        </div>
+
+        <!-- ============ Аккаунты: огонь за аватаром ============ -->
+        <h5 style="font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:1.5rem 0 .8rem">Аватары с фичером (огонь за аватаром)</h5>
+        <div style="display:flex;gap:2rem;flex-wrap:wrap">
+            <div style="text-align:center">
+                <div class="avatar-ring feat-1"><div class="fire"></div><div class="profile-avatar">1</div></div>
+                <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Уровень 1<br><span style="color:var(--featc,#f59e0b)">оранжевый</span></p>
+            </div>
+            <div style="text-align:center">
+                <div class="avatar-ring feat-2"><div class="fire"></div><div class="profile-avatar">2</div></div>
+                <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Уровень 2<br><span style="color:#f97316">глубокий оранжевый</span></p>
+            </div>
+            <div style="text-align:center">
+                <div class="avatar-ring feat-3"><div class="fire"></div><div class="profile-avatar">3</div></div>
+                <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Уровень 3<br><span style="color:#ef4444">красный</span></p>
+            </div>
+            <div style="text-align:center">
+                <div class="avatar-ring feat-4"><div class="fire"></div><div class="profile-avatar">4</div></div>
+                <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Уровень 4<br><span style="color:#ec4899">розовый</span></p>
+            </div>
+            <div style="text-align:center">
+                <div class="avatar-ring feat-5"><div class="fire"></div><div class="profile-avatar">5</div></div>
+                <p style="font-size:.75rem;color:var(--muted);margin-top:.6rem">Уровень 5<br><span style="color:#a855f7">ФИОЛЕТОВЫЙ, самый бешеный</span></p>
+            </div>
+        </div>
+
+        <!-- ============ Модели: огонь у названия ============ -->
+        <h5 style="font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:2.2rem 0 .8rem">Названия моделей с фичером</h5>
+
+        <div class="md-name-row" style="margin-bottom:.7rem">
+            <h1 style="font-size:1.4rem;font-weight:600">Space Cruiser</h1>
+            <span class="feat-badge" data-level="1" title="Уровень 1"><svg class="flame"><use href="#i-flame"/></svg></span>
+        </div>
+
+        <div class="md-name-row" style="margin-bottom:.7rem">
+            <h1 style="font-size:1.4rem;font-weight:600">Dragon Warrior</h1>
+            <span class="feat-badge" data-level="2" title="Уровень 2"><svg class="flame"><use href="#i-flame"/></svg></span>
+        </div>
+
+        <div class="md-name-row" style="margin-bottom:.7rem">
+            <h1 class="feat-name-3" style="font-size:1.4rem;font-weight:600">Medieval Castle</h1>
+            <span class="feat-badge" data-level="3" title="Уровень 3"><svg class="flame"><use href="#i-flame"/></svg></span>
+        </div>
+
+        <div class="md-name-row" style="margin-bottom:.7rem">
+            <h1 class="feat-name-4" style="font-size:1.4rem;font-weight:600">Neon Cyber City</h1>
+            <span class="feat-badge" data-level="4" title="Уровень 4"><svg class="flame"><use href="#i-flame"/></svg></span>
+        </div>
+
+        <div class="md-name-row" style="margin-bottom:.7rem">
+            <h1 class="feat-name-5" style="font-size:1.4rem;font-weight:600">LEGENDARY SWORD</h1>
+            <span class="feat-badge" data-level="5" title="Уровень 5 — самый лучший"><svg class="flame"><use href="#i-flame"/></svg></span>
+        </div>
+
+        <!-- ============ Карточки в ленте: мини-огонь ============ -->
+        <h5 style="font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:2.2rem 0 .8rem">Карточки в ленте (мини-огонь у названия)</h5>
+        <div style="display:flex;gap:1.2rem;flex-wrap:wrap">
+            <div class="model-card" style="max-width:240px">
+                <div style="height:120px;background:linear-gradient(135deg,var(--accent-soft),transparent)"></div>
+                <div class="card-info">
+                    <div class="card-name-row">
+                        <span class="card-name">Space Cruiser</span>
+                        <span class="mini-feat" data-level="1"><svg><use href="#i-flame"/></svg></span>
+                    </div>
+                    <div class="card-author">Автор</div>
+                </div>
+            </div>
+            <div class="model-card" style="max-width:240px">
+                <div style="height:120px;background:linear-gradient(135deg,var(--accent-soft),transparent)"></div>
+                <div class="card-info">
+                    <div class="card-name-row">
+                        <span class="card-name feat-name-4">Dragon Warrior</span>
+                        <span class="mini-feat" data-level="4"><svg><use href="#i-flame"/></svg></span>
+                    </div>
+                    <div class="card-author">Автор</div>
+                </div>
+            </div>
+            <div class="model-card" style="max-width:240px">
+                <div style="height:120px;background:linear-gradient(135deg,var(--accent-soft),transparent)"></div>
+                <div class="card-info">
+                    <div class="card-name-row">
+                        <span class="card-name feat-name-5">LEGENDARY SWORD</span>
+                        <span class="mini-feat" data-level="5"><svg><use href="#i-flame"/></svg></span>
+                    </div>
+                    <div class="card-author">Автор</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ Админ: выбор уровня ============ -->
+        <h5 style="font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:2.2rem 0 .8rem">Админ-панель выбора уровня (потому живёт на страницах модели и профиля)</h5>
+
+        <div class="admin-tools" style="max-width:480px;margin-bottom:1rem">
+            <span class="admin-tools-title">Featured level (model)</span>
+            <div class="feat-picker">
+                <button class="feat-pick" data-feat="0" type="button" title="Убрать фичер">&times;</button>
+                <button class="feat-pick" data-feat="1" type="button" title="Уровень 1"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick" data-feat="2" type="button" title="Уровень 2"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick active" data-feat="3" type="button" title="Уровень 3"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick" data-feat="4" type="button" title="Уровень 4"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick" data-feat="5" type="button" title="Уровень 5"><svg><use href="#i-flame"/></svg></button>
+            </div>
+        </div>
+
+        <div class="admin-tools" style="max-width:480px">
+            <span class="admin-tools-title">Featured level (account)</span>
+            <div class="feat-picker">
+                <button class="feat-pick" data-feat="0" type="button" title="Убрать фичер">&times;</button>
+                <button class="feat-pick" data-feat="1" type="button" title="Уровень 1"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick" data-feat="2" type="button" title="Уровень 2"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick" data-feat="3" type="button" title="Уровень 3"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick" data-feat="4" type="button" title="Уровень 4"><svg><use href="#i-flame"/></svg></button>
+                <button class="feat-pick active" data-feat="5" type="button" title="Уровень 5"><svg><use href="#i-flame"/></svg></button>
+            </div>
+        </div>
+
+        <p class="hint" style="margin-top:2rem">
+            Потрогай кнопки-огоньки: они подсвечиваются при наведении.
+            Уровень 5 везде самый «горячий» — фиолетовый вихрь за аватаром и переливающееся название.
+            Когда посмотришь — скажи, что поменять, и я подключу фичеры к настоящим моделям и аккаунтам.
+        </p>
+
+    </main>
+</body>
+</html>

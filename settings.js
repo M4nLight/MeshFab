@@ -132,6 +132,14 @@ function renderProfileTab() {
     document.getElementById('pf-preview-user').textContent = u.user;
     document.getElementById('pf-name-input').value = pf.name || '';
     document.getElementById('pf-bio-input').value = pf.bio || '';
+
+    // Огонь фичера аккаунта за превью-аватаром
+    const ring = document.getElementById('st-ring');
+    if (ring) {
+        ring.classList.remove('feat-1', 'feat-2', 'feat-3', 'feat-4', 'feat-5');
+        if ((u.feat || 0) >= 1) ring.classList.add('feat-' + u.feat);
+    }
+
     renderProfilePreview();
 
     document.querySelectorAll('#pf-color-row .accent-dot').forEach(b =>

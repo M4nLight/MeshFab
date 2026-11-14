@@ -25,6 +25,17 @@
 </head>
 <body>
 
+    <!-- SVG-спрайт: иконки, которые используются много раз.
+         <use href="#i-flame"> вставляет огонь в любом месте страницы -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-flame" viewBox="0 0 24 24">
+            <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
+        </symbol>
+        <symbol id="i-bell" viewBox="0 0 24 24">
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+        </symbol>
+    </svg>
+
     <!-- ================= Шапка (как у Sketchfab) ================= -->
     <header class="topbar">
         <!-- Логотип: «M» из граней (векторная иконка сайта).
@@ -137,7 +148,13 @@
                 </div>
 
                 <aside class="model-side">
-                    <h1 id="md-name">—</h1>
+                    <!-- Название + бейдж фичера (уровень 1–5 ставит админ) -->
+                    <div class="md-name-row">
+                        <h1 id="md-name">—</h1>
+                        <span class="feat-badge hidden" id="md-feat" data-level="1" data-i18n-title="feat.title" title="Featured by MeshFab Studio">
+                            <svg class="flame"><use href="#i-flame"/></svg>
+                        </span>
+                    </div>
                     <a href="#" class="md-author" id="md-author">by —</a>
 
                     <div class="md-meta">
@@ -152,13 +169,40 @@
                     <p class="md-desc" id="md-desc"></p>
                     <div class="md-tags" id="md-tags"></div>
 
+                    <!-- Админ-инструменты: фичер модели (видит только админ) -->
+                    <div class="admin-tools hidden" id="md-admin-tools">
+                        <span class="admin-tools-title" data-i18n="feat.admin_model">Featured level</span>
+                        <div class="feat-picker" id="md-feat-picker">
+                            <button class="feat-pick" data-feat="0" type="button" data-i18n-title="feat.none" title="Remove">&times;</button>
+                            <button class="feat-pick" data-feat="1" type="button" title="Level 1"><svg><use href="#i-flame"/></svg></button>
+                            <button class="feat-pick" data-feat="2" type="button" title="Level 2"><svg><use href="#i-flame"/></svg></button>
+                            <button class="feat-pick" data-feat="3" type="button" title="Level 3"><svg><use href="#i-flame"/></svg></button>
+                            <button class="feat-pick" data-feat="4" type="button" title="Level 4"><svg><use href="#i-flame"/></svg></button>
+                            <button class="feat-pick" data-feat="5" type="button" title="Level 5"><svg><use href="#i-flame"/></svg></button>
+                        </div>
+                    </div>
+
                     <div class="md-actions">
                         <button class="btn" id="md-like" type="button" data-i18n="model.like">Like</button>
                         <!-- Скачивание: видно только если автор разрешил -->
                         <a class="btn primary" id="md-download" data-i18n="model.download" download>Download</a>
                         <span class="no-download hidden" id="md-no-download" data-i18n="model.no_download">Download disabled by author</span>
+                        <!-- Жалоба на модель (уходит админу) -->
+                        <button class="btn ghost" id="md-report" data-i18n="model.report" type="button">Report</button>
                         <!-- Удалить может только автор или админ -->
                         <button class="btn danger hidden" id="md-delete" data-i18n="model.delete" type="button">Delete</button>
+                    </div>
+
+                    <!-- Комментарии: пишутся под моделью, автор модели получает уведомление -->
+                    <div class="md-comments">
+                        <h4 data-i18n="comments.title">Comments</h4>
+                        <form id="comment-form" class="comment-form">
+                            <textarea id="comment-input" data-i18n-ph="comments.ph" placeholder="Write a comment…" maxlength="500" rows="2"></textarea>
+                            <button class="btn primary" data-i18n="comments.send" type="submit">Send</button>
+                        </form>
+                        <p class="hint hidden" id="comments-guest" data-i18n="comments.signin">Sign in to comment</p>
+                        <div class="comments-list" id="comments-list"></div>
+                        <p class="empty-note hidden" id="comments-empty" data-i18n="comments.none">No comments yet</p>
                     </div>
                 </aside>
             </div>
@@ -167,7 +211,11 @@
         <!-- ================= PROFILE PAGE ================= -->
         <section class="view" id="view-profile">
             <div class="profile-head">
-                <div class="profile-avatar" id="pf-avatar">M</div>
+                <!-- Кольцо фичера: огонь за аватаром, класс feat-1…feat-5 ставит JS -->
+                <div class="avatar-ring" id="pf-ring">
+                    <div class="fire"></div>
+                    <div class="profile-avatar" id="pf-avatar">M</div>
+                </div>
                 <div>
                     <h1 id="pf-name">—</h1>
                     <p class="profile-sub" id="pf-joined"></p>
@@ -175,6 +223,20 @@
                 </div>
                 <button class="btn ghost hidden" id="pf-logout" data-i18n="profile.logout" type="button">Log out</button>
             </div>
+
+            <!-- Админ-инструменты: фичер аккаунта (видит только админ) -->
+            <div class="admin-tools hidden" id="pf-admin-tools">
+                <span class="admin-tools-title" data-i18n="feat.admin_account">Account featured level</span>
+                <div class="feat-picker" id="pf-feat-picker">
+                    <button class="feat-pick" data-feat="0" type="button" data-i18n-title="feat.none" title="Remove">&times;</button>
+                    <button class="feat-pick" data-feat="1" type="button" title="Level 1"><svg><use href="#i-flame"/></svg></button>
+                    <button class="feat-pick" data-feat="2" type="button" title="Level 2"><svg><use href="#i-flame"/></svg></button>
+                    <button class="feat-pick" data-feat="3" type="button" title="Level 3"><svg><use href="#i-flame"/></svg></button>
+                    <button class="feat-pick" data-feat="4" type="button" title="Level 4"><svg><use href="#i-flame"/></svg></button>
+                    <button class="feat-pick" data-feat="5" type="button" title="Level 5"><svg><use href="#i-flame"/></svg></button>
+                </div>
+            </div>
+
             <div class="models-grid" id="profile-grid"></div>
             <p class="empty-note hidden" id="profile-empty" data-i18n="profile.empty">No models yet</p>
         </section>
@@ -276,6 +338,19 @@
                 </label>
 
                 <button class="btn primary wide" data-i18n="upload.publish" type="submit">Publish</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: жалоба на модель (уходит админу) ================= -->
+    <div class="modal-backdrop hidden" id="report-modal">
+        <div class="modal glass">
+            <button class="modal-close" id="report-close" type="button">&times;</button>
+            <h3 data-i18n="report.title">Report model</h3>
+            <p class="hint" data-i18n="report.hint">Something breaks the rules? Tell the admin.</p>
+            <form id="report-form">
+                <textarea id="report-text" data-i18n-ph="report.ph" placeholder="What is wrong with this model? (18+, wrong license…)" maxlength="300" rows="3"></textarea>
+                <button class="btn danger wide" data-i18n="report.send" type="submit">Send report</button>
             </form>
         </div>
     </div>

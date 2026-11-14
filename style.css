@@ -28,22 +28,22 @@
 }
 
 :root[data-theme="light"] {
-    --bg: #f2f4f7;
+    --bg: #e9edf2;
     --bg-grad: radial-gradient(circle at 50% 0%, #ffffff 0%, #eef1f5 100%) fixed;
-    --text: #1a2028;
-    --muted: #8a94a3;
-    --faint: #9aa4b0;
-    --glass-bg: rgba(255, 255, 255, 0.55);
-    --glass-bg-2: rgba(255, 255, 255, 0.75);
-    --glass-bg-hover: rgba(255, 255, 255, 0.95);
-    --glass-border: rgba(10, 30, 50, 0.08);
-    --glass-border-hover: rgba(10, 30, 50, 0.2);
-    --input-bg: rgba(255, 255, 255, 0.7);
+    --text: #131a23;
+    --muted: #57636f;
+    --faint: #6e7b88;
+    --glass-bg: #ffffff;
+    --glass-bg-2: #ffffff;
+    --glass-bg-hover: #ffffff;
+    --glass-border: rgba(13, 34, 56, 0.16);
+    --glass-border-hover: rgba(13, 34, 56, 0.34);
+    --input-bg: #ffffff;
     --input-bg-focus: #ffffff;
-    --modal-bg: rgba(250, 251, 253, 0.92);
-    --shadow: rgba(30, 50, 80, 0.12);
-    --shadow-2: rgba(30, 50, 80, 0.18);
-    --chip-bg: rgba(10, 30, 50, 0.06);
+    --modal-bg: rgba(252, 253, 255, 0.97);
+    --shadow: rgba(15, 40, 70, 0.16);
+    --shadow-2: rgba(15, 40, 70, 0.26);
+    --chip-bg: rgba(13, 34, 56, 0.07);
 }
 
 /* Акцентный цвет (меняется в Sttng) */
@@ -930,6 +930,511 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
+/* ================= Фичеры: уровни 1–5 ================= */
+/* 1 — оранжевый огонь → 5 — фиолетовый.
+   Модели: значок огня у названия + свечение (на 5-м уровне — перелив).
+   Аккаунты: анимированное огненное кольцо за аватаром. */
+
+@keyframes fireSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes firePulse {
+    from { filter: blur(6px) brightness(1); }
+    to   { filter: blur(10px) brightness(1.3); }
+}
+
+@keyframes featPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
+}
+
+@keyframes featShimmer {
+    to { background-position: 200% center; }
+}
+
+@keyframes featPop {
+    from { transform: scale(0); }
+    to   { transform: scale(1); }
+}
+
+/* Цвета уровней — от оранжевого к фиолетовому */
+.feat-badge, .mini-feat, .feat-pick, .avatar-ring {
+    --featc: #f59e0b;   /* основной цвет уровня */
+    --featc2: #fbbf24;  /* дополнительный (для огненного кольца) */
+}
+
+.feat-badge[data-level="2"], .mini-feat[data-level="2"], .feat-pick[data-feat="2"], .avatar-ring.feat-2 { --featc: #f97316; --featc2: #fdba74; }
+.feat-badge[data-level="3"], .mini-feat[data-level="3"], .feat-pick[data-feat="3"], .avatar-ring.feat-3 { --featc: #ef4444; --featc2: #fca5a5; }
+.feat-badge[data-level="4"], .mini-feat[data-level="4"], .feat-pick[data-feat="4"], .avatar-ring.feat-4 { --featc: #ec4899; --featc2: #f9a8d4; }
+.feat-badge[data-level="5"], .mini-feat[data-level="5"], .feat-pick[data-feat="5"], .avatar-ring.feat-5 { --featc: #a855f7; --featc2: #d8b4fe; }
+
+/* --- Бейдж фичера у названия модели --- */
+
+.md-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feat-badge {
+    display: inline-flex;
+    flex-shrink: 0;
+    animation: featPop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    cursor: help;
+}
+
+.feat-badge .flame {
+    fill: var(--featc);
+    width: 16px;
+    height: 16px;
+    filter: drop-shadow(0 0 5px var(--featc));
+    transition: width 0.25s, height 0.25s;
+}
+
+/* Чем выше уровень — тем крупнее и ярче огонь */
+.feat-badge[data-level="2"] .flame { width: 18px; height: 18px; }
+.feat-badge[data-level="3"] .flame { width: 20px; height: 20px; filter: drop-shadow(0 0 8px var(--featc)); }
+.feat-badge[data-level="4"] .flame { width: 23px; height: 23px; filter: drop-shadow(0 0 11px var(--featc)); }
+.feat-badge[data-level="5"] .flame {
+    width: 25px;
+    height: 25px;
+    filter: drop-shadow(0 0 13px var(--featc));
+    animation: featPulse 1.6s ease-in-out infinite;
+}
+
+/* Эффекты на самом названии (умеренно, без перебора).
+   Класс вешается и на название модели, и на названия в карточках ленты */
+.feat-name-3 { text-shadow: 0 0 12px rgba(239, 68, 68, 0.35); }
+.feat-name-4 { text-shadow: 0 0 16px rgba(236, 72, 153, 0.5); }
+
+/* 5-й уровень: название переливается фиолетово-розовым */
+.feat-name-5 {
+    background: linear-gradient(90deg, #a855f7, #ec4899, #a855f7);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: featShimmer 3.5s linear infinite;
+}
+
+/* --- Мини-огонь в карточках ленты --- */
+
+.card-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.card-name-row .card-name {
+    flex: 1;
+    min-width: 0;
+}
+
+.mini-feat {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.mini-feat svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--featc);
+}
+
+.mini-feat[data-level="4"] svg,
+.mini-feat[data-level="5"] svg {
+    filter: drop-shadow(0 0 4px var(--featc));
+    animation: featPulse 2s ease-in-out infinite;
+}
+
+/* --- Огненное кольцо за аватаром аккаунта --- */
+
+.avatar-ring {
+    position: relative;
+    width: 74px;
+    height: 74px;
+    flex-shrink: 0;
+}
+
+.avatar-ring .fire {
+    position: absolute;
+    inset: -3px;   /* огонь вплотную к краю аватарки, а не отдельно от неё */
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    /* Вращающийся огненный вихрь из двух секторов */
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        var(--featc) 14%,
+        var(--featc2) 20%,
+        transparent 34%,
+        transparent 50%,
+        var(--featc) 64%,
+        var(--featc2) 70%,
+        transparent 84%
+    );
+}
+
+/* Огонь включается только когда есть класс feat-1…feat-5 */
+.avatar-ring.feat-1 .fire,
+.avatar-ring.feat-2 .fire,
+.avatar-ring.feat-3 .fire,
+.avatar-ring.feat-4 .fire,
+.avatar-ring.feat-5 .fire {
+    opacity: 0.9;
+    animation: fireSpin 2.6s linear infinite, firePulse 1.1s ease-in-out infinite alternate;
+}
+
+/* У 5-го уровня огонь бешенее: быстрее, ярче,
+   плюс второй вихрь навстречу и пульсирующее кольцо искр */
+.avatar-ring.feat-5 .fire {
+    animation-duration: 1.5s, 0.7s;
+}
+
+.avatar-ring.feat-5 .fire::before,
+.avatar-ring.feat-5 .fire::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+}
+
+/* Второй вихрь — крутится в обратную сторону */
+.avatar-ring.feat-5 .fire::before {
+    background: conic-gradient(
+        from 180deg,
+        transparent 0%,
+        var(--featc2) 10%,
+        var(--featc) 16%,
+        transparent 30%,
+        transparent 55%,
+        var(--featc2) 66%,
+        var(--featc) 72%,
+        transparent 86%
+    );
+    filter: blur(4px);
+    opacity: 0.85;
+    animation: fireSpinRev 1.9s linear infinite;
+}
+
+/* Пульсирующее кольцо поверх огня */
+.avatar-ring.feat-5 .fire::after {
+    box-shadow: inset 0 0 14px 2px rgba(168, 85, 247, 0.7);
+    animation: featRingPulse 1s ease-in-out infinite;
+}
+
+@keyframes fireSpinRev {
+    to { transform: rotate(-360deg); }
+}
+
+@keyframes featRingPulse {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 1; }
+}
+
+/* Свечение и НА аватарке (внутри), и снаружи — огонь «лижет» край */
+.avatar-ring.feat-1 .profile-avatar { box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.45), 0 0 18px rgba(245, 158, 11, 0.55); }
+.avatar-ring.feat-2 .profile-avatar { box-shadow: inset 0 0 14px rgba(249, 115, 22, 0.5), 0 0 22px rgba(249, 115, 22, 0.6); }
+.avatar-ring.feat-3 .profile-avatar { box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.5), 0 0 24px rgba(239, 68, 68, 0.6); }
+.avatar-ring.feat-4 .profile-avatar { box-shadow: inset 0 0 16px rgba(236, 72, 153, 0.5), 0 0 26px rgba(236, 72, 153, 0.6); }
+.avatar-ring.feat-5 .profile-avatar { box-shadow: inset 0 0 18px rgba(168, 85, 247, 0.55), 0 0 30px rgba(168, 85, 247, 0.65); }
+
+/* --- Админ-панель выбора фичера --- */
+
+.admin-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin: 0.9rem 0;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: var(--chip-bg);
+    border: 1px dashed var(--glass-border-hover);
+}
+
+.admin-tools-title {
+    font-size: 0.68rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.feat-picker {
+    display: flex;
+    gap: 0.45rem;
+}
+
+.feat-pick {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--glass-bg-2);
+    border: 1px solid var(--glass-border-hover);
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.feat-pick svg {
+    width: 15px;
+    height: 15px;
+    fill: var(--featc);
+    opacity: 0.75;
+    transition: opacity 0.2s;
+}
+
+.feat-pick:hover {
+    transform: scale(1.12);
+    border-color: var(--featc);
+}
+
+.feat-pick:hover svg { opacity: 1; }
+
+.feat-pick.active {
+    border-color: var(--featc);
+    box-shadow: 0 0 12px var(--featc);
+}
+
+.feat-pick.active svg {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--featc));
+}
+
+/* ================= Адаптив ================= */
+
+/* ================= Уведомления (колокольчик) ================= */
+
+.notif-wrap {
+    position: relative;
+}
+
+.notif-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.notif-btn:hover {
+    border-color: var(--glass-border-hover);
+    background: var(--chip-bg);
+}
+
+.notif-btn svg {
+    width: 19px;
+    height: 19px;
+    fill: currentColor;
+}
+
+.notif-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 17px;
+    text-align: center;
+}
+
+.notif-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 320px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border-hover);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px var(--shadow);
+    z-index: 90;
+    padding: 6px;
+}
+
+.notif-menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px 6px;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.notif-clear {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 4px;
+}
+
+.notif-clear:hover { text-decoration: underline; }
+
+.notif-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 9px 10px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.notif-item:hover { background: var(--chip-bg); }
+
+.notif-item.unread {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-left: 3px solid var(--accent);
+}
+
+.notif-item .notif-date {
+    display: block;
+    font-size: 11px;
+    color: var(--faint);
+    margin-top: 3px;
+}
+
+.notif-empty {
+    padding: 18px 10px;
+    text-align: center;
+    color: var(--faint);
+    font-size: 13px;
+}
+
+/* ================= Комментарии ================= */
+
+.md-comments {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid var(--glass-border);
+}
+
+.md-comments h4 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+}
+
+.comment-form {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    margin-bottom: 14px;
+}
+
+.comment-form textarea {
+    flex: 1;
+    min-height: 40px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--input-bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 13px;
+    resize: vertical;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--chip-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.comment-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.comment-author {
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+}
+
+.comment-author:hover { text-decoration: underline; }
+
+.comment-date { color: var(--faint); }
+
+.comment-del {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--faint);
+    cursor: pointer;
+    font-size: 11px;
+    padding: 2px 4px;
+}
+
+.comment-del:hover { color: #dc3c3c; }
+
+.comment-text {
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.md-comments .empty-note { padding: 14px 0; }
+
+/* Модалка жалобы чуть уже */
+#report-modal .modal { max-width: 420px; }
+
+@media (max-width: 860px) {
+    .notif-menu { width: 280px; }
+}
+
 /* ================= Адаптив ================= */
 
 @media (max-width: 860px) {
@@ -938,3 +1443,4 @@ body {
     .search-box { max-width: none; }
     .logo-text, .cat-select { display: none; }
 }
+
