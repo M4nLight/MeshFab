@@ -663,6 +663,33 @@ const BAN_I18N = {
 
 for (const lang in BAN_I18N) Object.assign(I18N[lang], BAN_I18N[lang]);
 
+// ================= Фон (Персонализация) =================
+
+const BG_I18N = {
+    en: {
+        'sttng.bg_title': 'Background',
+        'sttng.bg_solid': 'Solid', 'sttng.bg_gradient': 'Gradient',
+        'sttng.bg_grid': 'Grid', 'sttng.bg_dots': 'Dots',
+    },
+    ru: {
+        'sttng.bg_title': 'Фон',
+        'sttng.bg_solid': 'Сплошной', 'sttng.bg_gradient': 'Градиент',
+        'sttng.bg_grid': 'Сетка', 'sttng.bg_dots': 'Точки',
+    },
+    es: {
+        'sttng.bg_title': 'Fondo',
+        'sttng.bg_solid': 'Sólido', 'sttng.bg_gradient': 'Degradado',
+        'sttng.bg_grid': 'Cuadrícula', 'sttng.bg_dots': 'Puntos',
+    },
+    zh: {
+        'sttng.bg_title': '背景',
+        'sttng.bg_solid': '纯色', 'sttng.bg_gradient': '渐变',
+        'sttng.bg_grid': '网格', 'sttng.bg_dots': '点阵',
+    },
+};
+
+for (const lang in BG_I18N) Object.assign(I18N[lang], BG_I18N[lang]);
+
 // ================= API =================
 
 let LANG = localStorage.getItem('mf_lang') || 'en';

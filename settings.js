@@ -69,10 +69,16 @@ document.querySelectorAll('.snav-item').forEach(btn => {
 // ================= Personalization: тема и акцент =================
 
 function applyTheme() {
-    const theme = localStorage.getItem('mf_theme') || 'dark';
-    const accent = localStorage.getItem('mf_accent') || 'cyan';
+    const theme = localStorage.getItem('mf_theme') || 'light';
+    const accent = localStorage.getItem('mf_accent') || 'orange';
     document.documentElement.dataset.theme = theme;
     document.documentElement.dataset.accent = accent;
+    // Фон: solid (по умолчанию, без градиента) / gradient / grid / dots
+    const bg = localStorage.getItem('mf_bg') || 'solid';
+    if (bg === 'solid') delete document.documentElement.dataset.bg;
+    else document.documentElement.dataset.bg = bg;
+    document.querySelectorAll('[data-bg-set]').forEach(b =>
+        b.classList.toggle('active', b.dataset.bgSet === bg));
     document.querySelectorAll('[data-theme-set]').forEach(b =>
         b.classList.toggle('active', b.dataset.themeSet === theme));
     document.querySelectorAll('[data-theme-set]').forEach(c => {
@@ -95,6 +101,14 @@ document.querySelectorAll('[data-accent-set]').forEach(btn => {
     btn.addEventListener('click', () => {
         localStorage.setItem('mf_accent', btn.dataset.accentSet);
         applyTheme();
+    });
+});
+
+document.querySelectorAll('[data-bg-set]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        localStorage.setItem('mf_bg', btn.dataset.bgSet);
+        applyTheme();
+        toast(t('sttng.bg_' + btn.dataset.bgSet) + ' ✓');
     });
 });
 
@@ -425,4 +439,5 @@ document.getElementById('st-reset-all').addEventListener('click', () => {
 // ================= Инициализация =================
 
 applyI18n();
+renderProfileTab();   // без этого вкладка «Профиль» открывалась пустой
 openSection(location.hash ? location.hash.slice(1) : 'personalization');

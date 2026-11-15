@@ -10,7 +10,8 @@
 :root,
 :root[data-theme="dark"] {
     --bg: #050505;
-    --bg-grad: radial-gradient(circle at 50% 0%, #0c0c14 0%, #050505 100%) fixed;
+    /* Твёрдый фон без градиента (по умолчанию). Градиент — опция в Sttng */
+    --bg-grad: #050505;
     --text: #ffffff;
     --muted: #666666;
     --faint: #555555;
@@ -29,7 +30,7 @@
 
 :root[data-theme="light"] {
     --bg: #e9edf2;
-    --bg-grad: radial-gradient(circle at 50% 0%, #ffffff 0%, #eef1f5 100%) fixed;
+    --bg-grad: #e9edf2;
     --text: #131a23;
     --muted: #57636f;
     --faint: #6e7b88;
@@ -59,6 +60,35 @@ body {
     min-height: 100vh;
     padding-top: 76px;
     transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ---- Опции фона (Sttng → Персонализация) ---- */
+
+/* Старый градиент — теперь опция, а не дефолт */
+:root[data-bg="gradient"] {
+    --bg-grad: radial-gradient(circle at 50% 0%, #0c0c14 0%, #050505 100%) fixed;
+}
+
+:root[data-bg="gradient"][data-theme="light"] {
+    --bg-grad: radial-gradient(circle at 50% 0%, #ffffff 0%, #eef1f5 100%) fixed;
+}
+
+/* Сетка «полигонов» — бледные линии под цвет текста */
+:root[data-bg="grid"] body {
+    background: var(--bg);
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--text) 5%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--text) 5%, transparent) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-attachment: fixed;
+}
+
+/* Точки как в 3D-редакторах */
+:root[data-bg="dots"] body {
+    background: var(--bg);
+    background-image: radial-gradient(color-mix(in srgb, var(--text) 12%, transparent) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    background-attachment: fixed;
 }
 
 .hidden { display: none !important; }

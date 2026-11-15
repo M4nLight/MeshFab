@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark" data-accent="cyan">
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light" data-accent="orange">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MeshFab — publish &amp; explore 3D models</title>
     <script>
         // Тема применяется до загрузки стилей, чтобы страница не мигала
-        document.documentElement.dataset.theme = localStorage.getItem('mf_theme') || 'dark';
-        document.documentElement.dataset.accent = localStorage.getItem('mf_accent') || 'cyan';
+        document.documentElement.dataset.theme = localStorage.getItem('mf_theme') || 'light';
+        document.documentElement.dataset.accent = localStorage.getItem('mf_accent') || 'orange';
+        const mfBg0 = localStorage.getItem('mf_bg');
+        if (mfBg0 && mfBg0 !== 'solid') document.documentElement.dataset.bg = mfBg0;
     </script>
     <!-- Стили сайта -->
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
     <!-- Иконка сайта: «M» из граней (logo.svg в корне папки) -->
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <!-- model-viewer используется только для превью-карточек в ленте -->
@@ -21,7 +23,7 @@
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <!-- Переводы (en / ru / es / zh) -->
-    <script src="i18n.js?v=6"></script>
+    <script src="i18n.js?v=7"></script>
 </head>
 <body>
 
@@ -387,7 +389,7 @@
     <div id="toast"></div>
 
     <!-- Скрипты сайта -->
-    <script src="viewer.js?v=6"></script>
-    <script src="script.js?v=6"></script>
+    <script src="viewer.js?v=7"></script>
+    <script src="script.js?v=7"></script>
 </body>
 </html>

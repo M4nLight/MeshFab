@@ -284,7 +284,87 @@ body { padding-top: 76px; }
     box-shadow: 0 8px 24px var(--accent-soft);
 }
 
-.lang-flag { font-size: 1.4rem; }
+/* Флажок — круглый SVG, не эмодзи */
+.lang-flag {
+    display: block;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 0.35rem;
+    box-shadow: inset 0 0 0 1px var(--glass-border-hover), 0 2px 8px var(--shadow);
+}
+
+.lang-flag svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ---- Опции фона (Персонализация) ---- */
+
+.bg-cards {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.bg-card {
+    appearance: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    padding: 0.7rem;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text);
+    font-size: 0.8rem;
+    transition: border-color 0.25s, transform 0.2s, box-shadow 0.25s;
+}
+
+.bg-card:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+}
+
+.bg-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 8px 24px var(--accent-soft);
+}
+
+.bg-preview {
+    display: block;
+    width: 74px;
+    height: 48px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border-hover);
+}
+
+/* Превью меняются вместе с темой страницы */
+.bg-p-solid { background: var(--bg); }
+
+.bg-p-gradient {
+    background: var(--bg);
+    background-image: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--text) 7%, transparent) 0%, transparent 80%);
+}
+
+.bg-p-grid {
+    background: var(--bg);
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--text) 14%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--text) 14%, transparent) 1px, transparent 1px);
+    background-size: 12px 12px;
+}
+
+.bg-p-dots {
+    background: var(--bg);
+    background-image: radial-gradient(color-mix(in srgb, var(--text) 22%, transparent) 1.5px, transparent 1.5px);
+    background-size: 12px 12px;
+}
 
 .lang-sub {
     font-style: normal;
