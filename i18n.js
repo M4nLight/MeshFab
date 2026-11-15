@@ -690,6 +690,96 @@ const BG_I18N = {
 
 for (const lang in BG_I18N) Object.assign(I18N[lang], BG_I18N[lang]);
 
+// ================= Выход с 5 подтверждениями + переключение аккаунтов =================
+
+const LOGOUT_I18N = {
+    en: {
+        'logout.title': 'Log out?',
+        'logout.stay': 'Stay',
+        'logout.next': 'Yes, log out',
+        'logout.final': 'Log out for real!',
+        'logout.step1': 'Are you sure you want to log out?',
+        'logout.step2': 'Really sure? (2 of 5)',
+        'logout.step3': 'Don\'t worry — your models stay in this browser. Still leaving? (3 of 5)',
+        'logout.step4': 'Last chance to stay… (4 of 5)',
+        'logout.step5': 'Okay okay! Logging you out. (5 of 5)',
+        'nav.switch': 'Switch account',
+        'nav.add_account': '+ Add account',
+        'toast.switched': 'Switched to {name}',
+    },
+    ru: {
+        'logout.title': 'Выйти?',
+        'logout.stay': 'Остаться',
+        'logout.next': 'Да, выйти',
+        'logout.final': 'Выйти по-настоящему!',
+        'logout.step1': 'Точно хочешь выйти?',
+        'logout.step2': 'Прямо уверен? (2 из 5)',
+        'logout.step3': 'Не переживай — модели останутся в браузере. Всё ещё выходим? (3 из 5)',
+        'logout.step4': 'Последний шанс остаться… (4 из 5)',
+        'logout.step5': 'Ладно-ладно! Выходим. (5 из 5)',
+        'nav.switch': 'Сменить аккаунт',
+        'nav.add_account': '+ Добавить аккаунт',
+        'toast.switched': 'Переключился на {name}',
+    },
+    es: {
+        'logout.title': '¿Cerrar sesión?',
+        'logout.stay': 'Quedarme',
+        'logout.next': 'Sí, salir',
+        'logout.final': '¡Salir de verdad!',
+        'logout.step1': '¿Seguro que quieres cerrar sesión?',
+        'logout.step2': '¿Muy seguro? (2 de 5)',
+        'logout.step3': 'Tranquilo — tus modelos se quedan en este navegador. ¿Aún sales? (3 de 5)',
+        'logout.step4': 'Última oportunidad… (4 de 5)',
+        'logout.step5': '¡Vale vale! Saliendo. (5 de 5)',
+        'nav.switch': 'Cambiar de cuenta',
+        'nav.add_account': '+ Añadir cuenta',
+        'toast.switched': 'Cambiado a {name}',
+    },
+    zh: {
+        'logout.title': '要退出登录吗？',
+        'logout.stay': '留下',
+        'logout.next': '是的，退出',
+        'logout.final': '真的退出！',
+        'logout.step1': '确定要退出登录吗？',
+        'logout.step2': '真的确定？(2/5)',
+        'logout.step3': '别担心——模型会留在这个浏览器里。还是要退出？(3/5)',
+        'logout.step4': '最后的机会了…… (4/5)',
+        'logout.step5': '好好好！正在退出。 (5/5)',
+        'nav.switch': '切换账号',
+        'nav.add_account': '+ 添加账号',
+        'toast.switched': '已切换到 {name}',
+    },
+};
+
+for (const lang in LOGOUT_I18N) Object.assign(I18N[lang], LOGOUT_I18N[lang]);
+
+// ================= Отдельные страницы входа/загрузки =================
+
+const PAGE_I18N = {
+    en: {
+        'auth.back': 'Back to models',
+        'auth.local_note': 'Accounts live only in your browser — nothing is sent anywhere.',
+        'upload.local_note': 'The file is stored only in your browser (IndexedDB), it never goes to a server.',
+    },
+    ru: {
+        'auth.back': 'Назад к моделям',
+        'auth.local_note': 'Аккаунты живут только в твоём браузере — никуда не отправляются.',
+        'upload.local_note': 'Файл хранится только в твоём браузере (IndexedDB) — ни на какой сервер не идёт.',
+    },
+    es: {
+        'auth.back': 'Volver a los modelos',
+        'auth.local_note': 'Las cuentas viven solo en tu navegador — no se envía nada.',
+        'upload.local_note': 'El archivo se guarda solo en tu navegador (IndexedDB), nunca va a un servidor.',
+    },
+    zh: {
+        'auth.back': '返回模型',
+        'auth.local_note': '账号只保存在你的浏览器里——不会发送到任何地方。',
+        'upload.local_note': '文件只保存在你的浏览器里（IndexedDB），绝不会传到服务器。',
+    },
+};
+
+for (const lang in PAGE_I18N) Object.assign(I18N[lang], PAGE_I18N[lang]);
+
 // ================= API =================
 
 let LANG = localStorage.getItem('mf_lang') || 'en';

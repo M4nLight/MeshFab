@@ -361,20 +361,63 @@ function renderAuthArea() {
                 menu.classList.add('hidden');
             }
         });
+        // Чип аккаунта + стрелочка: быстрое переключение между аккаунтами
         area.innerHTML = `
-            <button class="btn user-chip" id="user-chip" type="button" title="My profile">${esc(authorName(u.user))}</button>`;
+            <div class="acc-switch">
+                <button class="btn user-chip" id="user-chip" type="button" title="My profile">${esc(authorName(u.user))}</button>
+                <button class="acc-switch-btn" id="acc-switch-btn" type="button" title="${esc(t('nav.switch'))}">
+                    <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="acc-switch-menu hidden" id="acc-switch-menu"></div>
+            </div>`;
         document.getElementById('user-chip').addEventListener('click', () => openProfile(u.user));
+        document.getElementById('acc-switch-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            renderAccSwitchMenu();
+            document.getElementById('acc-switch-menu').classList.toggle('hidden');
+        });
         updateBellBadge();
     } else {
         bellArea.innerHTML = '';
         area.innerHTML = `
-            <button class="btn" id="login-open" data-i18n="nav.signin" type="button">Sign in</button>
-            <button class="btn primary" id="signup-open" data-i18n="nav.signup" type="button">Sign up</button>`;
-        document.getElementById('login-open').addEventListener('click', () => openAuthModal('login'));
-        document.getElementById('signup-open').addEventListener('click', () => openAuthModal('register'));
+            <a class="btn" href="auth.html" data-i18n="nav.signin">Sign in</a>
+            <a class="btn primary" href="auth.html?mode=register" data-i18n="nav.signup">Sign up</a>`;
         applyI18n(area);
     }
 }
+
+// ================= Переключение аккаунтов =================
+
+function renderAccSwitchMenu() {
+    const me = currentUser();
+    const menu = document.getElementById('acc-switch-menu');
+    if (!me || !menu) return;
+    const users = getUsers();
+    menu.innerHTML = users.map(x => `
+        <button class="acc-switch-item ${x.user.toLowerCase() === me.user.toLowerCase() ? 'current' : ''}" data-user="${esc(x.user)}" type="button">
+            <span class="acc-dot" style="--c:${(x.profile && x.profile.color) || 'cyan'}"></span>
+            <span>${esc(authorName(x.user))}</span>
+            ${x.user.toLowerCase() === me.user.toLowerCase() ? '<span class="acc-check">✔</span>' : ''}
+        </button>`).join('') + `
+        <a class="acc-switch-item add" href="auth.html?mode=register">${esc(t('nav.add_account'))}</a>`;
+
+    menu.querySelectorAll('.acc-switch-item[data-user]').forEach(btn =>
+        btn.addEventListener('click', () => {
+            localStorage.setItem(SESSION_KEY, btn.dataset.user);
+            menu.classList.add('hidden');
+            renderAuthArea();
+            renderHome();
+            toast(t('toast.switched', { name: authorName(btn.dataset.user) }));
+        }));
+}
+
+// Клик мимо меню переключения — закрыть
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('acc-switch-menu');
+    if (menu && !menu.classList.contains('hidden') && !e.target.closest('.acc-switch')) {
+        menu.classList.add('hidden');
+    }
+});
 
 // ================= Меню уведомлений =================
 
@@ -427,64 +470,8 @@ async function openNotif(nid) {
     if (n.modelId) await openModel(n.modelId);
 }
 
-// ================= Модалка входа / регистрации =================
-
-const authModal = document.getElementById('auth-modal');
-const loginForm = document.getElementById('auth-login-form');
-const regForm = document.getElementById('auth-reg-form');
-
-function openAuthModal(mode) {
-    switchAuth(mode || 'login');
-    authModal.classList.remove('hidden');
-}
-
-function switchAuth(mode) {
-    loginForm.classList.toggle('hidden', mode !== 'login');
-    regForm.classList.toggle('hidden', mode !== 'register');
-    document.querySelectorAll('#auth-modal [data-auth]').forEach(b =>
-        b.classList.toggle('active', b.dataset.auth === mode)
-    );
-    document.getElementById('auth-title').textContent =
-        mode === 'login' ? t('auth.title_login') : t('auth.title_register');
-}
-
-document.querySelectorAll('#auth-modal [data-auth]').forEach(b =>
-    b.addEventListener('click', () => switchAuth(b.dataset.auth))
-);
-
-document.getElementById('auth-close').addEventListener('click', () => authModal.classList.add('hidden'));
-authModal.addEventListener('click', (e) => {
-    if (e.target === authModal) authModal.classList.add('hidden');
-});
-
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const res = await login(
-        document.getElementById('login-user').value.trim(),
-        document.getElementById('login-pass').value
-    );
-    if (res.error) return toast(res.error);
-    authModal.classList.add('hidden');
-    renderAuthArea();
-    toast(t('toast.welcome_back', { name: authorName(currentUser().user) }));
-    loginForm.reset();
-});
-
-regForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const user = document.getElementById('reg-user').value.trim();
-    const pass = document.getElementById('reg-pass').value;
-    const pass2 = document.getElementById('reg-pass2').value;
-    if (user.length < 3 || user.length > 24) return toast(t('toast.short_user'));
-    if (pass.length < 8) return toast(t('toast.short_pass'));
-    if (pass !== pass2) return toast(t('toast.pass_mismatch'));
-    const res = await register(user, pass);
-    if (res.error) return toast(res.error);
-    authModal.classList.add('hidden');
-    renderAuthArea();
-    toast(t('toast.created', { name: user }));
-    regForm.reset();
-});
+// Вход/регистрация теперь на отдельной странице auth.html
+// (тут только переход по ссылкам из шапки)
 
 // ================= Дефолты просмотрщика из Sttng =================
 
@@ -1142,7 +1129,44 @@ async function openProfile(userName) {
     showView('profile');
 }
 
-document.getElementById('pf-logout').addEventListener('click', logout);
+// ================= Визард выхода (5 подтверждений, как в GitHub) =================
+
+let logoutStep = 0;
+
+function openLogoutWizard() {
+    logoutStep = 0;
+    document.getElementById('logout-modal').classList.remove('hidden');
+    renderLogoutStep();
+}
+
+function renderLogoutStep() {
+    const bar = document.getElementById('logout-progress');
+    const text = document.getElementById('logout-step-text');
+    const btn = document.getElementById('logout-confirm');
+    bar.style.width = (logoutStep / 5 * 100) + '%';
+    text.textContent = t('logout.step' + (logoutStep + 1));
+    btn.textContent = logoutStep === 4 ? t('logout.final') : t('logout.next');
+}
+
+document.getElementById('pf-logout').addEventListener('click', openLogoutWizard);
+
+document.getElementById('logout-confirm').addEventListener('click', () => {
+    logoutStep++;
+    if (logoutStep >= 5) {
+        document.getElementById('logout-modal').classList.add('hidden');
+        logout();
+        return;
+    }
+    renderLogoutStep();
+});
+
+document.getElementById('logout-cancel').addEventListener('click', () =>
+    document.getElementById('logout-modal').classList.add('hidden'));
+document.getElementById('logout-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('logout-modal')) {
+        document.getElementById('logout-modal').classList.add('hidden');
+    }
+});
 
 // Логотип всегда возвращает на главную
 document.getElementById('logo-home').addEventListener('click', (e) => {
@@ -1153,16 +1177,10 @@ document.getElementById('logo-home').addEventListener('click', (e) => {
 
 // ================= Выкладывание модели =================
 
-const uploadModal = document.getElementById('upload-modal');
-const upDrop = document.getElementById('up-drop');
-const upInput = document.getElementById('up-file-input');
-const upName = document.getElementById('up-name');
-let pendingFile = null;
-
+// Форма загрузки живёт на отдельной странице upload.html
 document.getElementById('upload-open').addEventListener('click', () => {
     if (!currentUser()) {
-        toast(t('toast.signin_upload'));
-        openAuthModal('register');
+        location.href = 'auth.html?mode=register';
         return;
     }
     // Запрет публикаций: бан типа «publish»
@@ -1171,91 +1189,7 @@ document.getElementById('upload-open').addEventListener('click', () => {
         toast(t('ban.upload_blocked', { r: ban.reason || '—' }));
         return;
     }
-    resetUploadForm();
-    uploadModal.classList.remove('hidden');
-});
-
-document.getElementById('upload-close').addEventListener('click', () => uploadModal.classList.add('hidden'));
-uploadModal.addEventListener('click', (e) => {
-    if (e.target === uploadModal) uploadModal.classList.add('hidden');
-});
-
-function resetUploadForm() {
-    pendingFile = null;
-    upName.value = '';
-    document.getElementById('up-desc').value = '';
-    document.getElementById('up-category').value = '';
-    document.getElementById('up-tags').value = '';
-    document.getElementById('up-license').value = 'CC-BY';
-    document.getElementById('up-public').checked = true;
-    document.getElementById('up-downloadable').checked = true;
-    document.getElementById('up-post').value = 'default';
-    document.getElementById('up-rules').checked = false;
-    document.getElementById('up-file-name').classList.add('hidden');
-    upInput.value = '';
-}
-
-// Выбор файла: клик по кнопке или drag & drop
-document.getElementById('up-file-btn').addEventListener('click', () => upInput.click());
-upInput.addEventListener('change', () => {
-    if (upInput.files.length) takeFile(upInput.files[0]);
-    upInput.value = '';
-});
-
-upDrop.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    upDrop.classList.add('dragover');
-});
-upDrop.addEventListener('dragleave', () => upDrop.classList.remove('dragover'));
-upDrop.addEventListener('drop', (e) => {
-    e.preventDefault();
-    upDrop.classList.remove('dragover');
-    if (e.dataTransfer.files.length) takeFile(e.dataTransfer.files[0]);
-});
-
-function takeFile(file) {
-    const name = file.name.toLowerCase();
-    if (!name.endsWith('.glb') && !name.endsWith('.gltf')) {
-        return toast(t('toast.file_invalid'));
-    }
-    pendingFile = file;
-    const el = document.getElementById('up-file-name');
-    el.textContent = '✔ ' + file.name + ' (' + fileSize(file.size) + ')';
-    el.classList.remove('hidden');
-    if (!upName.value.trim()) upName.value = file.name.replace(/\.(glb|gltf)$/i, '');
-}
-
-document.getElementById('upload-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const me = currentUser();
-    if (!me) { uploadModal.classList.add('hidden'); return openAuthModal('register'); }
-    if (!pendingFile) return toast(t('toast.choose_file'));
-    if (!document.getElementById('up-rules').checked) return toast(t('toast.rules_first'));
-
-    const model = {
-        name: upName.value.trim() || pendingFile.name,
-        desc: document.getElementById('up-desc').value.trim(),
-        category: document.getElementById('up-category').value,
-        tags: document.getElementById('up-tags').value.split(',').map(x => x.trim()).filter(Boolean),
-        license: document.getElementById('up-license').value,
-        public: document.getElementById('up-public').checked,
-        downloadable: document.getElementById('up-downloadable').checked,
-        noPost: document.getElementById('up-post').value === 'none',
-        author: me.user,
-        blob: pendingFile,
-        date: Date.now(),
-        views: 0,
-        likes: 0,
-    };
-
-    const id = await dbPut(model);
-    if (id == null) return toast(t('toast.save_fail'));
-
-    uploadModal.classList.add('hidden');
-    toast(t('toast.published'));
-    await renderHome();
-    showView('home');
-    openModel(id); // сразу показываем, как это делает Sketchfab
+    location.href = 'upload.html';
 });
 
 // ================= Демо-модели (только при самом первом запуске) =================
@@ -1324,4 +1258,10 @@ async function seedDemoModels() {
     await seedDemoModels();
     renderAuthArea();
     await renderHome();
+    // Возврат с upload.html: index.html#m=<id> — сразу открыть свежевыложенную модель
+    const mHash = location.hash.match(/^#m=(\d+)$/);
+    if (mHash) {
+        history.replaceState(null, '', location.pathname);
+        openModel(parseInt(mHash[1], 10));
+    }
 })();

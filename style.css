@@ -872,6 +872,144 @@ body {
 
 .modal.wide-modal { max-width: 560px; }
 
+/* ================= Отдельные страницы (auth.html / upload.html) ================= */
+
+.page-wrap {
+    min-height: calc(100vh - 100px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px 40px;
+}
+
+.page-wrap .modal {
+    animation: none;
+    max-height: none;
+}
+
+.page-title {
+    margin: 0 0 0.4rem;
+}
+
+.page-sub {
+    margin: 0 0 1.2rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+}
+
+.back-link:hover { color: var(--accent); }
+
+/* ================= Переключение аккаунтов ================= */
+
+.acc-switch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.acc-switch-btn {
+    appearance: none;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    width: 22px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.acc-switch-btn:hover {
+    color: var(--text);
+    background: var(--chip-bg);
+}
+
+.acc-switch-btn svg { width: 14px; height: 14px; }
+
+.acc-switch-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 200px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border-hover);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px var(--shadow);
+    z-index: 90;
+    padding: 6px;
+}
+
+.acc-switch-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.acc-switch-item:hover { background: var(--chip-bg); }
+
+.acc-switch-item.current { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+.acc-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--c), color-mix(in srgb, var(--c) 60%, #334155));
+}
+
+.acc-check { margin-left: auto; color: var(--accent); font-size: 12px; }
+
+.acc-switch-item.add { color: var(--accent); font-weight: 600; }
+
+/* ================= Визард выхода ================= */
+
+.logout-progress-track {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--chip-bg);
+    overflow: hidden;
+    margin: 0.6rem 0 0.8rem;
+}
+
+.logout-progress {
+    height: 100%;
+    width: 0;
+    border-radius: 3px;
+    background: var(--accent);
+    transition: width 0.25s ease;
+}
+
+.logout-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 1.2rem;
+}
+
 @keyframes modalIn {
     from { opacity: 0; transform: translateY(24px) scale(0.97); }
     to   { opacity: 1; transform: translateY(0) scale(1); }

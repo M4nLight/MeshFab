@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" data-accent="orange">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeshFab — Upload a model</title>
+    <script>
+        // Тема применяется до загрузки стилей, чтобы страница не мигала
+        document.documentElement.dataset.theme = localStorage.getItem('mf_theme') || 'light';
+        document.documentElement.dataset.accent = localStorage.getItem('mf_accent') || 'orange';
+        const mfBg0 = localStorage.getItem('mf_bg');
+        if (mfBg0 && mfBg0 !== 'solid') document.documentElement.dataset.bg = mfBg0;
+    </script>
+    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    <script src="i18n.js?v=8"></script>
+</head>
+<body>
+
+    <!-- Пикселизация вместо гаус-размытия -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <filter id="mf-pixel" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            <feFlood x="3" y="3" width="2" height="2"/>
+            <feComposite width="8" height="8"/>
+            <feTile result="tile"/>
+            <feComposite in="SourceGraphic" in2="tile" operator="in"/>
+            <feMorphology operator="dilate" radius="4"/>
+        </filter>
+    </svg>
+
+    <header class="topbar">
+        <a class="logo" href="index.html">
+            <svg class="logo-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="10,54 10,14 24,34 32,20 40,34 54,14 54,54 44,54 44,32 38,42 32,36 26,42 20,32 20,54" fill="var(--accent)" opacity="0.35"/>
+                <polygon points="10,14 24,34 10,40" fill="var(--accent)" opacity="0.9"/>
+                <polygon points="24,34 32,20 32,36 26,42" fill="var(--accent)" opacity="0.65"/>
+                <polygon points="32,20 40,34 32,36" fill="var(--accent)" opacity="0.9"/>
+                <polygon points="40,34 54,14 54,40" fill="var(--accent)" opacity="0.65"/>
+            </svg>
+            <span class="logo-text">MeshFab</span>
+        </a>
+    </header>
+
+    <main class="page-wrap">
+        <div class="modal glass wide-modal">
+            <a class="back-link" href="index.html">← <span data-i18n="auth.back">Back to models</span></a>
+            <h3 class="page-title" data-i18n="upload.title">Upload a model</h3>
+            <p class="page-sub" data-i18n="upload.local_note">The file is stored only in your browser (IndexedDB), it never goes to a server.</p>
+
+            <!-- Выбор файла: перетаскивание или клик -->
+            <div class="drop-zone" id="up-drop">
+                <p class="drop-title" data-i18n="upload.drop_title">Drag &amp; drop a .glb or .gltf file here</p>
+                <button class="glass-btn small" id="up-file-btn" data-i18n="upload.choose" type="button">Or choose a file</button>
+                <input type="file" id="up-file-input" accept=".glb,.gltf" hidden>
+                <p class="drop-file hidden" id="up-file-name"></p>
+            </div>
+
+            <form id="upload-form">
+                <input type="text" id="up-name" data-i18n-ph="upload.name_ph" placeholder="Model name" maxlength="60" required>
+                <textarea id="up-desc" data-i18n-ph="upload.desc_ph" placeholder="Description (what is it, how it was made…)" maxlength="1000" rows="3"></textarea>
+
+                <div class="form-row">
+                    <select id="up-category">
+                        <option value="" data-i18n="upload.category">Category…</option>
+                        <option value="Characters" data-i18n="cat.Characters">Characters</option>
+                        <option value="Creatures" data-i18n="cat.Creatures">Creatures</option>
+                        <option value="Vehicles" data-i18n="cat.Vehicles">Vehicles</option>
+                        <option value="Architecture" data-i18n="cat.Architecture">Architecture</option>
+                        <option value="Nature" data-i18n="cat.Nature">Nature</option>
+                        <option value="Abstract" data-i18n="cat.Abstract">Abstract</option>
+                        <option value="Other" data-i18n="cat.Other">Other</option>
+                    </select>
+                    <select id="up-license">
+                        <option value="CC0" data-i18n="license.CC0">License: CC0 (public domain)</option>
+                        <option value="CC-BY" selected data-i18n="license.CC-BY">License: CC-BY</option>
+                        <option value="CC-BY-SA" data-i18n="license.CC-BY-SA">License: CC-BY-SA</option>
+                        <option value="Editorial" data-i18n="license.Editorial">Editorial use only</option>
+                    </select>
+                </div>
+
+                <input type="text" id="up-tags" data-i18n-ph="upload.tags_ph" placeholder="Tags, comma separated (low poly, sci-fi…)">
+
+                <div class="form-row">
+                    <label class="check-row">
+                        <input type="checkbox" id="up-public" checked>
+                        <span data-i18n="upload.public">Public</span>
+                    </label>
+                    <label class="check-row">
+                        <input type="checkbox" id="up-downloadable" checked>
+                        <span data-i18n="upload.allow_dl">Allow download</span>
+                    </label>
+                </div>
+
+                <!-- Пост-обработка: применяется к модели по умолчанию при просмотре -->
+                <label class="check-row select-label">
+                    <span data-i18n="upload.post">Default post-processing:</span>
+                    <select id="up-post">
+                        <option value="default" data-i18n="upload.post_on">On (tone mapping)</option>
+                        <option value="none" data-i18n="upload.post_off">No post-processing</option>
+                    </select>
+                </label>
+
+                <!-- Подтверждение правил сообщества (без 18+) -->
+                <label class="check-row rules-check">
+                    <input type="checkbox" id="up-rules" required>
+                    <span data-i18n="upload.rules">I confirm this model follows the Community Rules</span>
+                </label>
+
+                <button class="btn primary wide" data-i18n="upload.publish" type="submit">Publish</button>
+            </form>
+        </div>
+    </main>
+
+    <div id="toast"></div>
+
+    <script src="upload.js?v=8"></script>
+</body>
+</html>

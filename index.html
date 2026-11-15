@@ -12,7 +12,7 @@
         if (mfBg0 && mfBg0 !== 'solid') document.documentElement.dataset.bg = mfBg0;
     </script>
     <!-- Стили сайта -->
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
     <!-- Иконка сайта: «M» из граней (logo.svg в корне папки) -->
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <!-- model-viewer используется только для превью-карточек в ленте -->
@@ -23,7 +23,7 @@
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <!-- Переводы (en / ru / es / zh) -->
-    <script src="i18n.js?v=7"></script>
+    <script src="i18n.js?v=8"></script>
 </head>
 <body>
 
@@ -273,102 +273,20 @@
 
     </main>
 
-    <!-- ================= MODAL: sign in / sign up (no email) ================= -->
-    <div class="modal-backdrop hidden" id="auth-modal">
+    <!-- Вход/регистрация — отдельная страница auth.html -->
+
+    <!-- Загрузка модели — отдельная страница upload.html -->
+
+    <!-- ================= MODAL: визард выхода (5 подтверждений, как в GitHub) ================= -->
+    <div class="modal-backdrop hidden" id="logout-modal">
         <div class="modal glass">
-            <button class="modal-close" id="auth-close" type="button">&times;</button>
-            <h3 id="auth-title">Sign in to MeshFab</h3>
-
-            <div class="auth-switch">
-                <button class="glass-btn active" data-auth="login" data-i18n="auth.tab_login" type="button">Sign in</button>
-                <button class="glass-btn" data-auth="register" data-i18n="auth.tab_register" type="button">Sign up</button>
+            <h3 data-i18n="logout.title">Log out?</h3>
+            <div class="logout-progress-track"><div class="logout-progress" id="logout-progress"></div></div>
+            <p class="hint" id="logout-step-text">Are you sure?</p>
+            <div class="logout-buttons">
+                <button class="btn ghost" id="logout-cancel" data-i18n="logout.stay" type="button">Stay</button>
+                <button class="btn danger" id="logout-confirm" type="button">Log out</button>
             </div>
-
-            <form id="auth-login-form">
-                <input type="text" id="login-user" data-i18n-ph="auth.user_ph" placeholder="Username" maxlength="24" autocomplete="username" required>
-                <input type="password" id="login-pass" data-i18n-ph="auth.pass_ph" placeholder="Password" autocomplete="current-password" required>
-                <button class="btn primary wide" data-i18n="auth.tab_login" type="submit">Sign in</button>
-            </form>
-
-            <!-- Регистрация без мейла: только ник и пароль.
-                 Пароль хранится как PBKDF2-хеш с солью, в открытом виде никогда не сохраняется -->
-            <form id="auth-reg-form" class="hidden">
-                <input type="text" id="reg-user" data-i18n-ph="auth.user_new_ph" placeholder="Pick a username (3–24)" maxlength="24" autocomplete="username" required>
-                <input type="password" id="reg-pass" data-i18n-ph="auth.pass_new_ph" placeholder="Pick a password (min 8)" minlength="8" autocomplete="new-password" required>
-                <input type="password" id="reg-pass2" data-i18n-ph="auth.pass2_ph" placeholder="Repeat password" minlength="8" autocomplete="new-password" required>
-                <button class="btn primary wide" data-i18n="auth.tab_register" type="submit">Create account</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- ================= MODAL: upload a model (как в Sketchfab) ================= -->
-    <div class="modal-backdrop hidden" id="upload-modal">
-        <div class="modal glass wide-modal">
-            <button class="modal-close" id="upload-close" type="button">&times;</button>
-            <h3 data-i18n="upload.title">Upload a model</h3>
-
-            <!-- Выбор файла: перетаскивание или клик.
-                 Файл хранится локально в браузере (IndexedDB), на сервер не отправляется -->
-            <div class="drop-zone" id="up-drop">
-                <p class="drop-title" data-i18n="upload.drop_title">Drag &amp; drop a .glb or .gltf file here</p>
-                <button class="glass-btn small" id="up-file-btn" data-i18n="upload.choose" type="button">Or choose a file</button>
-                <input type="file" id="up-file-input" accept=".glb,.gltf" hidden>
-                <p class="drop-file hidden" id="up-file-name"></p>
-            </div>
-
-            <form id="upload-form">
-                <input type="text" id="up-name" data-i18n-ph="upload.name_ph" placeholder="Model name" maxlength="60" required>
-                <textarea id="up-desc" data-i18n-ph="upload.desc_ph" placeholder="Description (what is it, how it was made…)" maxlength="1000" rows="3"></textarea>
-
-                <div class="form-row">
-                    <select id="up-category">
-                        <option value="" data-i18n="upload.category">Category…</option>
-                        <option value="Characters" data-i18n="cat.Characters">Characters</option>
-                        <option value="Creatures" data-i18n="cat.Creatures">Creatures</option>
-                        <option value="Vehicles" data-i18n="cat.Vehicles">Vehicles</option>
-                        <option value="Architecture" data-i18n="cat.Architecture">Architecture</option>
-                        <option value="Nature" data-i18n="cat.Nature">Nature</option>
-                        <option value="Abstract" data-i18n="cat.Abstract">Abstract</option>
-                        <option value="Other" data-i18n="cat.Other">Other</option>
-                    </select>
-                    <select id="up-license">
-                        <option value="CC0" data-i18n="license.CC0">License: CC0 (public domain)</option>
-                        <option value="CC-BY" selected data-i18n="license.CC-BY">License: CC-BY</option>
-                        <option value="CC-BY-SA" data-i18n="license.CC-BY-SA">License: CC-BY-SA</option>
-                        <option value="Editorial" data-i18n="license.Editorial">Editorial use only</option>
-                    </select>
-                </div>
-
-                <input type="text" id="up-tags" data-i18n-ph="upload.tags_ph" placeholder="Tags, comma separated (low poly, sci-fi…)">
-
-                <div class="form-row">
-                    <label class="check-row">
-                        <input type="checkbox" id="up-public" checked>
-                        <span data-i18n="upload.public">Public</span>
-                    </label>
-                    <label class="check-row">
-                        <input type="checkbox" id="up-downloadable" checked>
-                        <span data-i18n="upload.allow_dl">Allow download</span>
-                    </label>
-                </div>
-
-                <!-- Пост-обработка: применяется к модели по умолчанию при просмотре -->
-                <label class="check-row select-label">
-                    <span data-i18n="upload.post">Default post-processing:</span>
-                    <select id="up-post">
-                        <option value="default" data-i18n="upload.post_on">On (tone mapping)</option>
-                        <option value="none" data-i18n="upload.post_off">No post-processing</option>
-                    </select>
-                </label>
-
-                <!-- Подтверждение правил сообщества (без 18+) -->
-                <label class="check-row rules-check">
-                    <input type="checkbox" id="up-rules" required>
-                    <span data-i18n="upload.rules">I confirm this model follows the Community Rules</span>
-                </label>
-
-                <button class="btn primary wide" data-i18n="upload.publish" type="submit">Publish</button>
-            </form>
         </div>
     </div>
 
@@ -389,7 +307,7 @@
     <div id="toast"></div>
 
     <!-- Скрипты сайта -->
-    <script src="viewer.js?v=7"></script>
-    <script src="script.js?v=7"></script>
+    <script src="viewer.js?v=8"></script>
+    <script src="script.js?v=8"></script>
 </body>
 </html>

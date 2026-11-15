@@ -12,12 +12,12 @@
         if (bg0 && bg0 !== 'solid') document.documentElement.dataset.bg = bg0;
     </script>
     <!-- Общие стили сайта (кнопки, формы, темы) + стили страницы настроек -->
-    <link rel="stylesheet" href="style.css?v=7">
-    <link rel="stylesheet" href="settings.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="settings.css?v=8">
     <!-- Иконка сайта -->
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <!-- Переводы -->
-    <script src="i18n.js?v=7"></script>
+    <script src="i18n.js?v=8"></script>
 </head>
 <body>
 
@@ -62,7 +62,6 @@
             <button class="snav-item" data-sec="language" data-i18n="sttng.tab_lang">Language</button>
             <button class="snav-item" data-sec="viewer" data-i18n="sttng.tab_viewer">Viewer</button>
             <button class="snav-item" data-sec="rules" data-i18n="sttng.tab_rules">Rules</button>
-            <button class="snav-item" data-sec="storage" data-i18n="sttng.tab_storage">Storage</button>
             <button class="snav-item" data-sec="about" data-i18n="sttng.tab_about">About</button>
         </nav>
 
@@ -296,34 +295,6 @@
                 <div class="rules-list" id="rules-list"></div>
             </section>
 
-            <!-- ================= Storage: только для админа ================= -->
-            <section class="ssec" id="sec-storage">
-                <h2 data-i18n="sttng.storage_title">Storage</h2>
-
-                <!-- Незалогиненным — только предложение зарегистрироваться -->
-                <div class="guest-note hidden" id="storage-guest">
-                    <p data-i18n="sttng.guest_note">You don't have an account yet. Sign up to customize your profile.</p>
-                    <a class="btn primary" href="index.html" data-i18n="nav.signup">Sign up</a>
-                </div>
-
-                <div class="hidden" id="storage-editor">
-                    <p class="hint" data-i18n="sttng.storage_hint">All models, accounts and settings live only in this browser.</p>
-
-                    <div class="storage-stats glass">
-                        <div><span id="st-models-count">0</span> <span data-i18n="sttng.st_models">models stored</span></div>
-                        <div><span id="st-bytes">0 KB</span> <span data-i18n="sttng.st_bytes">of 3D files</span></div>
-                        <div><span id="st-users-count">0</span> <span data-i18n="sttng.st_users">accounts on this device</span></div>
-                    </div>
-
-                    <!-- Опасные кнопки: только администратор -->
-                    <div class="danger-row" id="storage-admin-zone">
-                        <button class="btn" id="st-clear-models" data-i18n="sttng.clear_models" type="button">Delete all uploaded models</button>
-                        <button class="btn danger" id="st-reset-all" data-i18n="sttng.full_reset" type="button">Full reset (everything)</button>
-                    </div>
-                    <p class="hint admin-only-hint hidden" id="storage-admin-hint" data-i18n="sttng.admin_only">Deleting everything is allowed only for the admin account (MeshFab).</p>
-                </div>
-            </section>
-
             <!-- ================= About ================= -->
             <section class="ssec" id="sec-about">
                 <h2 data-i18n="sttng.about_title">About</h2>
@@ -343,6 +314,6 @@
 
     <div id="toast"></div>
 
-    <script src="settings.js?v=7"></script>
+    <script src="settings.js?v=8"></script>
 </body>
 </html>

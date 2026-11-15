@@ -284,7 +284,6 @@ document.getElementById('st-logout').addEventListener('click', () => {
     localStorage.removeItem(SESSION_KEY);
     renderAccount();
     renderProfileTab();
-    renderStorageAccess();
     toast(t('toast.logged_out'));
 });
 
@@ -298,7 +297,6 @@ document.getElementById('st-delete-acc').addEventListener('click', () => {
     localStorage.removeItem('mf_likes_' + u.user.toLowerCase());
     renderAccount();
     renderProfileTab();
-    renderStorageAccess();
     toast(t('toast.deleted'));
 });
 
@@ -369,72 +367,6 @@ function renderRules() {
     });
 }
 renderRules();
-
-// ================= Storage: опасные кнопки только у админа =================
-
-function readStorage() {
-    const req = indexedDB.open('meshfab', 1);
-    req.onsuccess = () => {
-        const db = req.result;
-        const store = db.transaction('models').objectStore('models').getAll();
-        store.onsuccess = () => {
-            const models = store.result;
-            document.getElementById('st-models-count').textContent = models.length;
-            const bytes = models.reduce((sum, m) => sum + (m.blob ? m.blob.size : 0), 0);
-            document.getElementById('st-bytes').textContent =
-                bytes < 1024 * 1024 ? Math.round(bytes / 1024) + ' KB' : (bytes / 1024 / 1024).toFixed(1) + ' MB';
-            document.getElementById('st-users-count').textContent = getUsers().length;
-        };
-    };
-}
-
-// Кто что видит во вкладке Storage:
-// гость → «зарегайся», юзер → только статистика, админ → всё
-function renderStorageAccess() {
-    const u = currentUser();
-    document.getElementById('storage-guest').classList.toggle('hidden', !!u);
-    document.getElementById('storage-editor').classList.toggle('hidden', !u);
-    if (!u) return;
-    document.getElementById('storage-admin-zone').classList.toggle('hidden', !isAdmin());
-    document.getElementById('storage-admin-hint').classList.toggle('hidden', isAdmin());
-    readStorage();
-}
-renderStorageAccess();
-
-// Удалить все модели — только админ
-document.getElementById('st-clear-models').addEventListener('click', () => {
-    if (!isAdmin()) return toast(t('toast.admin_only'));
-    if (!confirm(t('sttng.confirm_clear'))) return;
-    const req = indexedDB.open('meshfab', 1);
-    req.onsuccess = () => {
-        req.result.transaction('models', 'readwrite').objectStore('models').clear();
-        localStorage.removeItem('mf_seeded_v2'); // демо-модели можно засеять заново
-        readStorage();
-        toast(t('toast.models_cleared'));
-    };
-});
-
-// Полный сброс — только админ
-document.getElementById('st-reset-all').addEventListener('click', () => {
-    if (!isAdmin()) return toast(t('toast.admin_only'));
-    if (!confirm(t('sttng.confirm_reset'))) return;
-    const req = indexedDB.open('meshfab', 1);
-    req.onsuccess = () => {
-        req.result.transaction('models', 'readwrite').objectStore('models').clear();
-        const theme = localStorage.getItem('mf_theme');
-        const accent = localStorage.getItem('mf_accent');
-        const lang = localStorage.getItem('mf_lang');
-        Object.keys(localStorage).filter(k => k.startsWith('mf_')).forEach(k => localStorage.removeItem(k));
-        localStorage.setItem('mf_theme', theme);
-        localStorage.setItem('mf_accent', accent);
-        localStorage.setItem('mf_lang', lang);
-        readStorage();
-        renderAccount();
-        renderProfileTab();
-        renderStorageAccess();
-        toast(t('toast.reset_done'));
-    };
-});
 
 // ================= Инициализация =================
 
