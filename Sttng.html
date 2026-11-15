@@ -10,14 +10,25 @@
         document.documentElement.dataset.accent = localStorage.getItem('mf_accent') || 'cyan';
     </script>
     <!-- Общие стили сайта (кнопки, формы, темы) + стили страницы настроек -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="settings.css">
+    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="settings.css?v=6">
     <!-- Иконка сайта -->
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <!-- Переводы -->
-    <script src="i18n.js"></script>
+    <script src="i18n.js?v=6"></script>
 </head>
 <body>
+
+    <!-- Пикселизация вместо гаус-размытия (используется в settings.css) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <filter id="mf-pixel" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            <feFlood x="3" y="3" width="2" height="2"/>
+            <feComposite width="8" height="8"/>
+            <feTile result="tile"/>
+            <feComposite in="SourceGraphic" in2="tile" operator="in"/>
+            <feMorphology operator="dilate" radius="4"/>
+        </filter>
+    </svg>
 
     <!-- Шапка настроек -->
     <header class="topbar">
@@ -263,6 +274,6 @@
 
     <div id="toast"></div>
 
-    <script src="settings.js"></script>
+    <script src="settings.js?v=6"></script>
 </body>
 </html>

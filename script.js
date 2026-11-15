@@ -110,6 +110,28 @@ function currentUser() {
 
 const isAdmin = () => { const u = currentUser(); return !!(u && u.admin); };
 
+// ================= Баны аккаунтов =================
+
+// Активен ли бан: timed истекает по дате, permanent и publish — нет
+function banActive(u) {
+    const b = u && u.ban;
+    if (!b) return null;
+    if (b.type === 'timed' && (!b.until || b.until <= Date.now())) return null;
+    return b;
+}
+
+// Текст статуса бана (для профиля и админки)
+function banText(u, keyBase) {
+    const b = banActive(u);
+    if (!b) return t('ban.none');
+    let text;
+    if (b.type === 'permanent') text = t(keyBase + '_perm');
+    else if (b.type === 'publish') text = t(keyBase + '_publish');
+    else text = t(keyBase + '_timed', { date: fmtDate(b.until) });
+    if (b.reason) text += ' · ' + t('ban.reason_label', { r: b.reason });
+    return text;
+}
+
 // ================= Уведомления (в localStorage, у каждого свои) =================
 
 // У каждого юзера свой список: mf_notifs_<имя>. Уведомления видит только он —
@@ -249,6 +271,17 @@ async function login(user, pass) {
     }
 
     localStorage.removeItem(attemptsKey);
+
+    // Забаненный (timed/permanent) не может войти; ban по публикациям — может
+    const ban = banActive(found);
+    if (ban && ban.type !== 'publish') {
+        return {
+            error: ban.type === 'permanent'
+                ? t('ban.login_perm', { r: ban.reason || '—' })
+                : t('ban.login_until', { date: fmtDate(ban.until), r: ban.reason || '—' }),
+        };
+    }
+
     localStorage.setItem(SESSION_KEY, found.user);
     return { ok: true };
 }
@@ -303,18 +336,18 @@ function fmtDate(ts) {
 
 function renderAuthArea() {
     const area = document.getElementById('auth-area');
+    const bellArea = document.getElementById('notif-area');
     const u = currentUser();
     if (u) {
-        area.innerHTML = `
+        // Колокольчик живёт в отдельном контейнере — левее кнопки Upload
+        bellArea.innerHTML = `
             <div class="notif-wrap">
                 <button class="notif-btn" id="notif-btn" type="button" title="${esc(t('nav.notifs'))}">
                     <svg><use href="#i-bell"/></svg>
                     <span class="notif-count hidden" id="notif-count">0</span>
                 </button>
                 <div class="notif-menu hidden" id="notif-menu"></div>
-            </div>
-            <button class="btn user-chip" id="user-chip" type="button" title="My profile">${esc(authorName(u.user))}</button>`;
-        document.getElementById('user-chip').addEventListener('click', () => openProfile(u.user));
+            </div>`;
         document.getElementById('notif-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             const menu = document.getElementById('notif-menu');
@@ -328,8 +361,12 @@ function renderAuthArea() {
                 menu.classList.add('hidden');
             }
         });
+        area.innerHTML = `
+            <button class="btn user-chip" id="user-chip" type="button" title="My profile">${esc(authorName(u.user))}</button>`;
+        document.getElementById('user-chip').addEventListener('click', () => openProfile(u.user));
         updateBellBadge();
     } else {
+        bellArea.innerHTML = '';
         area.innerHTML = `
             <button class="btn" id="login-open" data-i18n="nav.signin" type="button">Sign in</button>
             <button class="btn primary" id="signup-open" data-i18n="nav.signup" type="button">Sign up</button>`;
@@ -872,7 +909,68 @@ function renderProfileFeat(user) {
     if (lvl >= 1) ring.classList.add('feat-' + lvl);
     syncFeatPicker('pf-feat-picker', lvl);
     document.getElementById('pf-admin-tools').classList.toggle('hidden', !isAdmin());
+    // Бан: красный бейдж видят все, статус в админ-панели — админ
+    renderBanBadge(user);
+    if (isAdmin()) renderBanStatus(user);
 }
+
+// Красный бейдж «ЗАБАНЕН» в шапке профиля
+function renderBanBadge(user) {
+    const el = document.getElementById('pf-ban');
+    if (!el) return;
+    const b = banActive(user);
+    el.classList.toggle('hidden', !b);
+    if (!b) return;
+    let text = b.type === 'permanent' ? t('ban.badge_perm')
+        : b.type === 'publish' ? t('ban.badge_publish')
+        : t('ban.badge_timed', { date: fmtDate(b.until) });
+    el.textContent = text;
+}
+
+// Строка статуса внутри админ-панели банов
+function renderBanStatus(user) {
+    const el = document.getElementById('ban-status');
+    if (!el) return;
+    el.textContent = banText(user, 'ban.status');
+}
+
+// Кнопки бана: срок / навсегда / запрет публикаций / снять
+document.getElementById('ban-buttons').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-ban]');
+    if (!btn || !currentProfileUser) return;
+    const users = getUsers();
+    const u = users.find(x => x.user.toLowerCase() === currentProfileUser.toLowerCase());
+    if (!u) return;
+    const kind = btn.dataset.ban;
+
+    if (kind === 'remove') {
+        u.ban = null;
+        toast(t('ban.removed'));
+    } else {
+        const reason = document.getElementById('ban-reason').value.trim();
+        const now = Date.now();
+        const DAY = 86400000;
+        u.ban = {
+            type: kind === 'permanent' ? 'permanent' : kind === 'publish' ? 'publish' : 'timed',
+            until: kind === 'day' ? now + DAY : kind === 'week' ? now + 7 * DAY : kind === 'month' ? now + 30 * DAY : null,
+            reason,
+        };
+        toast(t('ban.saved'));
+    }
+    saveUsers(users);
+
+    // Если забанили того, кто прямо сейчас сидит в этом браузере — выкидываем
+    const me = currentUser();
+    if (me && me.user.toLowerCase() === u.user.toLowerCase()) {
+        const b = banActive(u);
+        if (b && b.type !== 'publish') {
+            localStorage.removeItem(SESSION_KEY);
+            renderAuthArea();
+        }
+    }
+    renderBanBadge(u);
+    renderBanStatus(u);
+});
 
 // ================= Комментарии под моделью =================
 
@@ -1065,6 +1163,12 @@ document.getElementById('upload-open').addEventListener('click', () => {
     if (!currentUser()) {
         toast(t('toast.signin_upload'));
         openAuthModal('register');
+        return;
+    }
+    // Запрет публикаций: бан типа «publish»
+    const ban = banActive(currentUser());
+    if (ban && ban.type === 'publish') {
+        toast(t('ban.upload_blocked', { r: ban.reason || '—' }));
         return;
     }
     resetUploadForm();

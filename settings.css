@@ -82,8 +82,8 @@ body { padding-top: 76px; }
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: url(#mf-pixel);
+    -webkit-backdrop-filter: url(#mf-pixel);
     box-shadow: 0 12px 30px var(--shadow);
 }
 

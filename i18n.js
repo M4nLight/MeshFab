@@ -592,6 +592,77 @@ const NOTIF_I18N = {
 
 for (const lang in NOTIF_I18N) Object.assign(I18N[lang], NOTIF_I18N[lang]);
 
+// ================= Баны =================
+
+const BAN_I18N = {
+    en: {
+        'ban.title': 'Ban this account',
+        'ban.reason_ph': 'Reason…',
+        'ban.day': '1 day', 'ban.week': '1 week', 'ban.month': '1 month',
+        'ban.forever': 'Forever', 'ban.publish': 'No publishing', 'ban.remove': 'Remove ban',
+        'ban.none': 'Not banned',
+        'ban.status_timed': 'Banned until {date}', 'ban.status_perm': 'Banned forever',
+        'ban.status_publish': 'Publishing blocked',
+        'ban.reason_label': 'Reason: {r}',
+        'ban.badge_timed': 'BANNED until {date}', 'ban.badge_perm': 'BANNED FOREVER',
+        'ban.badge_publish': 'PUBLISHING BLOCKED',
+        'ban.login_until': 'You are banned until {date}. Reason: {r}',
+        'ban.login_perm': 'You are banned forever. Reason: {r}',
+        'ban.upload_blocked': 'Publishing is blocked for your account. Reason: {r}',
+        'ban.saved': 'Ban updated', 'ban.removed': 'Ban removed',
+    },
+    ru: {
+        'ban.title': 'Бан этого аккаунта',
+        'ban.reason_ph': 'Причина…',
+        'ban.day': '1 день', 'ban.week': '1 неделю', 'ban.month': '1 месяц',
+        'ban.forever': 'Навсегда', 'ban.publish': 'Запрет публикаций', 'ban.remove': 'Снять бан',
+        'ban.none': 'Не забанен',
+        'ban.status_timed': 'Забанен до {date}', 'ban.status_perm': 'Забанен навсегда',
+        'ban.status_publish': 'Публикации запрещены',
+        'ban.reason_label': 'Причина: {r}',
+        'ban.badge_timed': 'ЗАБАНЕН до {date}', 'ban.badge_perm': 'ЗАБАНЕН НАВСЕГДА',
+        'ban.badge_publish': 'ПУБЛИКАЦИИ ЗАПРЕЩЕНЫ',
+        'ban.login_until': 'Ты забанен до {date}. Причина: {r}',
+        'ban.login_perm': 'Ты забанен навсегда. Причина: {r}',
+        'ban.upload_blocked': 'Публикации запрещены для твоего аккаунта. Причина: {r}',
+        'ban.saved': 'Бан обновлён', 'ban.removed': 'Бан снят',
+    },
+    es: {
+        'ban.title': 'Banear esta cuenta',
+        'ban.reason_ph': 'Motivo…',
+        'ban.day': '1 día', 'ban.week': '1 semana', 'ban.month': '1 mes',
+        'ban.forever': 'Para siempre', 'ban.publish': 'Sin publicar', 'ban.remove': 'Quitar baneo',
+        'ban.none': 'No baneado',
+        'ban.status_timed': 'Baneado hasta {date}', 'ban.status_perm': 'Baneado para siempre',
+        'ban.status_publish': 'Publicación bloqueada',
+        'ban.reason_label': 'Motivo: {r}',
+        'ban.badge_timed': 'BANEADO hasta {date}', 'ban.badge_perm': 'BANEADO PARA SIEMPRE',
+        'ban.badge_publish': 'PUBLICACIÓN BLOQUEADA',
+        'ban.login_until': 'Estás baneado hasta {date}. Motivo: {r}',
+        'ban.login_perm': 'Estás baneado para siempre. Motivo: {r}',
+        'ban.upload_blocked': 'Publicación bloqueada para tu cuenta. Motivo: {r}',
+        'ban.saved': 'Baneo actualizado', 'ban.removed': 'Baneo quitado',
+    },
+    zh: {
+        'ban.title': '封禁该账号',
+        'ban.reason_ph': '原因…',
+        'ban.day': '1 天', 'ban.week': '1 周', 'ban.month': '1 个月',
+        'ban.forever': '永久', 'ban.publish': '禁止投稿', 'ban.remove': '解除封禁',
+        'ban.none': '未封禁',
+        'ban.status_timed': '封禁至 {date}', 'ban.status_perm': '永久封禁',
+        'ban.status_publish': '禁止投稿',
+        'ban.reason_label': '原因：{r}',
+        'ban.badge_timed': '已封禁至 {date}', 'ban.badge_perm': '永久封禁',
+        'ban.badge_publish': '禁止投稿',
+        'ban.login_until': '你被封禁至 {date}。原因：{r}',
+        'ban.login_perm': '你被永久封禁。原因：{r}',
+        'ban.upload_blocked': '你的账号被禁止投稿。原因：{r}',
+        'ban.saved': '封禁已更新', 'ban.removed': '封禁已解除',
+    },
+};
+
+for (const lang in BAN_I18N) Object.assign(I18N[lang], BAN_I18N[lang]);
+
 // ================= API =================
 
 let LANG = localStorage.getItem('mf_lang') || 'en';

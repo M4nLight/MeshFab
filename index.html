@@ -10,7 +10,7 @@
         document.documentElement.dataset.accent = localStorage.getItem('mf_accent') || 'cyan';
     </script>
     <!-- Стили сайта -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=6">
     <!-- Иконка сайта: «M» из граней (logo.svg в корне папки) -->
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <!-- model-viewer используется только для превью-карточек в ленте -->
@@ -21,13 +21,22 @@
     <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <!-- Переводы (en / ru / es / zh) -->
-    <script src="i18n.js"></script>
+    <script src="i18n.js?v=6"></script>
 </head>
 <body>
 
     <!-- SVG-спрайт: иконки, которые используются много раз.
          <use href="#i-flame"> вставляет огонь в любом месте страницы -->
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <!-- Пикселизация вместо гаус-размытия: режет фон на квадратики 8×8.
+             Используется в CSS как backdrop-filter: url(#mf-pixel) -->
+        <filter id="mf-pixel" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            <feFlood x="3" y="3" width="2" height="2"/>
+            <feComposite width="8" height="8"/>
+            <feTile result="tile"/>
+            <feComposite in="SourceGraphic" in2="tile" operator="in"/>
+            <feMorphology operator="dilate" radius="4"/>
+        </filter>
         <symbol id="i-flame" viewBox="0 0 24 24">
             <path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/>
         </symbol>
@@ -70,8 +79,10 @@
             <option value="Other" data-i18n="cat.Other">Other</option>
         </select>
 
-        <!-- Правая часть шапки: «Upload» + вход/аккаунт + настройки -->
+        <!-- Правая часть шапки: колокольчик + «Upload» + вход/аккаунт + настройки -->
         <div class="top-actions">
+            <!-- Колокольчик уведомлений (рендерит JS) -->
+            <div id="notif-area"></div>
             <button class="btn primary" id="upload-open" data-i18n="nav.upload" type="button">Upload</button>
             <div id="auth-area"></div>
             <!-- Кнопка настроек (страница Sttng) -->
@@ -220,11 +231,13 @@
                     <h1 id="pf-name">—</h1>
                     <p class="profile-sub" id="pf-joined"></p>
                     <p class="profile-sub" id="pf-bio"></p>
+                    <!-- Бейдж бана: видят все, кто откроет профиль -->
+                    <p class="ban-badge hidden" id="pf-ban"></p>
                 </div>
                 <button class="btn ghost hidden" id="pf-logout" data-i18n="profile.logout" type="button">Log out</button>
             </div>
 
-            <!-- Админ-инструменты: фичер аккаунта (видит только админ) -->
+            <!-- Админ-инструменты: фичер аккаунта + баны (видит только админ) -->
             <div class="admin-tools hidden" id="pf-admin-tools">
                 <span class="admin-tools-title" data-i18n="feat.admin_account">Account featured level</span>
                 <div class="feat-picker" id="pf-feat-picker">
@@ -234,6 +247,21 @@
                     <button class="feat-pick" data-feat="3" type="button" title="Level 3"><svg><use href="#i-flame"/></svg></button>
                     <button class="feat-pick" data-feat="4" type="button" title="Level 4"><svg><use href="#i-flame"/></svg></button>
                     <button class="feat-pick" data-feat="5" type="button" title="Level 5"><svg><use href="#i-flame"/></svg></button>
+                </div>
+
+                <!-- Баны: срок / навсегда / запрет публикаций + причина -->
+                <div class="ban-tools">
+                    <span class="admin-tools-title" data-i18n="ban.title">Ban this account</span>
+                    <input type="text" id="ban-reason" data-i18n-ph="ban.reason_ph" placeholder="Reason…" maxlength="120">
+                    <div class="ban-buttons" id="ban-buttons">
+                        <button class="btn ban-btn danger" data-ban="day" type="button" data-i18n="ban.day">1 day</button>
+                        <button class="btn ban-btn danger" data-ban="week" type="button" data-i18n="ban.week">1 week</button>
+                        <button class="btn ban-btn danger" data-ban="month" type="button" data-i18n="ban.month">1 month</button>
+                        <button class="btn ban-btn danger" data-ban="permanent" type="button" data-i18n="ban.forever">Forever</button>
+                        <button class="btn ban-btn warn" data-ban="publish" type="button" data-i18n="ban.publish">No publishing</button>
+                        <button class="btn ban-btn ok" data-ban="remove" type="button" data-i18n="ban.remove">Remove ban</button>
+                    </div>
+                    <p class="ban-status" id="ban-status"></p>
                 </div>
             </div>
 
@@ -359,7 +387,7 @@
     <div id="toast"></div>
 
     <!-- Скрипты сайта -->
-    <script src="viewer.js"></script>
-    <script src="script.js"></script>
+    <script src="viewer.js?v=6"></script>
+    <script src="script.js?v=6"></script>
 </body>
 </html>
